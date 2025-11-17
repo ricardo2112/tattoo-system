@@ -1,4 +1,6 @@
+using Backend.Authentication;
 using Backend.Context;
+using Backend.Services.AuthenticationService;
 using Backend.Services.CatalogoService;
 using Backend.Services.CitaService;
 using Backend.Services.ClienteService;
@@ -37,6 +39,8 @@ builder.Services.AddCors(options =>
 
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IJWTAuthentication, JWTAuthentication>();  
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<ITutorService, TutorService>();

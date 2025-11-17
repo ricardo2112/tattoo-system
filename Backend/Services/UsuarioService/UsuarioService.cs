@@ -2,8 +2,6 @@
 using Backend.DTOs;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Backend.Services.UsuarioService
 {
@@ -103,11 +101,13 @@ namespace Backend.Services.UsuarioService
                     }
                 }
 
+                var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
                 // Crear el usuario
                 var nuevoUsuario = new Usuario
                 {
                     Username = request.Username,
-                    PasswordHash = HashPassword(request.Password),
+                    PasswordHash = passwordHash,
                     Nombre = request.Nombre ?? string.Empty,
                     Apellido = request.Apellido ?? string.Empty,
                     Activo = true,
@@ -172,7 +172,7 @@ namespace Backend.Services.UsuarioService
                     throw new KeyNotFoundException($"El usuario con ID {id} no existe");
                 }
 
-                usuario.PasswordHash = HashPassword(newPassword);
+                usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
                 _context.Usuarios.Update(usuario);
                 _context.SaveChanges();
 
@@ -336,21 +336,6 @@ namespace Backend.Services.UsuarioService
             catch (Exception ex)
             {
                 throw new Exception($"Error al obtener el historial de roles del usuario con ID {idUsuario}", ex);
-            }
-        }
-
-        // Métodos privados auxiliares
-        private static string HashPassword(string password)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
             }
         }
     }
