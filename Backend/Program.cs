@@ -1,6 +1,9 @@
 using Backend.Context;
 using Backend.Services.CatalogoService;
+using Backend.Services.CitaService;
 using Backend.Services.ClienteService;
+using Backend.Services.PagoService;
+using Backend.Services.TatuajeService;
 using Backend.Services.TutorService;
 using Backend.Services.UsuarioService;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +20,9 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<ITutorService, TutorService>();
+builder.Services.AddScoped<ITatuajeService, TatuajeService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<ICitaService, CitaService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

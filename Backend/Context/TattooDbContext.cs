@@ -17,6 +17,11 @@ namespace Backend.Context
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Tutor> Tutores { get; set; }
         public virtual DbSet<ClienteTutor> ClienteTutores { get; set; }
+        public virtual DbSet<Tatuaje> Tatuajes { get; set; }
+        public virtual DbSet<Pago> Pagos { get; set; }
+        public virtual DbSet<PagoTatuaje> PagoTatuajes { get; set; }
+        public virtual DbSet<CitaServicio> CitaServicios { get; set; }
+        public virtual DbSet<CitaTatuaje> CitaTatuajes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -119,6 +124,76 @@ namespace Backend.Context
                 entity.HasOne(e => e.Cliente)
                     .WithMany(c => c.ClienteTutores)
                     .HasForeignKey(e => e.IdCliente)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Tatuaje>(entity =>
+            {
+                entity.HasKey(e => e.IdTatuaje);
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.FechaActualizacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(e => e.Cliente)
+                    .WithMany()
+                    .HasForeignKey(e => e.IdCliente)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Usuario)
+                    .WithMany()
+                    .HasForeignKey(e => e.RegistradoPor)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Pago>(entity =>
+            {
+                entity.HasKey(e => e.IdPago);
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<PagoTatuaje>(entity =>
+            {
+                entity.HasKey(e => new { e.IdTatuaje, e.IdPago });
+
+                entity.HasOne(e => e.Tatuaje)
+                    .WithMany(t => t.PagoTatuajes)
+                    .HasForeignKey(e => e.IdTatuaje)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Pago)
+                    .WithMany(p => p.PagoTatuajes)
+                    .HasForeignKey(e => e.IdPago)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<CitaServicio>(entity =>
+            {
+                entity.HasKey(e => e.IdCita);
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.FechaActualizacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            modelBuilder.Entity<CitaTatuaje>(entity =>
+            {
+                entity.HasKey(e => new { e.IdTatuaje, e.IdCita });
+
+                entity.HasOne(e => e.Tatuaje)
+                    .WithMany(t => t.CitaTatuajes)
+                    .HasForeignKey(e => e.IdTatuaje)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.CitaServicio)
+                    .WithMany(c => c.CitaTatuajes)
+                    .HasForeignKey(e => e.IdCita)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
