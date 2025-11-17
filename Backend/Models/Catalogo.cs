@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Backend.Models
 {
@@ -22,6 +23,7 @@ namespace Backend.Models
 
         // Relaciones
         [ForeignKey("IdTipoCatalogo")]
-        public virtual TipoCatalogo TipoCatalogo { get; set; } = null!;
+        [JsonIgnore]
+        public virtual TipoCatalogo? TipoCatalogo { get; set; }
     }
 }

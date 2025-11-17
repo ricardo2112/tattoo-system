@@ -1,16 +1,18 @@
 using Backend.Context;
+using Backend.Services.CatalogoService;
 using Backend.Services.UsuarioService;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración del DbContext con MySQL
+// Base de datos
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<TattooDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Registrar servicios
+// Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
