@@ -1,5 +1,7 @@
 using Backend.Context;
 using Backend.Services.CatalogoService;
+using Backend.Services.ClienteService;
+using Backend.Services.TutorService;
 using Backend.Services.UsuarioService;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,8 @@ builder.Services.AddDbContext<TattooDbContext>(options =>
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<ITutorService, TutorService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
