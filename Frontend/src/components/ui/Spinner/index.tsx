@@ -10,9 +10,29 @@
  * ```
  */
 
-import { forwardRef } from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 import { Loader2 } from 'lucide-react';
-import type { SpinnerProps } from './Spinner.types';
+
+export type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
+
+export interface SpinnerProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Size of the spinner
+   * @default 'md'
+   */
+  size?: SpinnerSize;
+
+  /**
+   * Color of the spinner (Tailwind color class)
+   * @default 'primary-600'
+   */
+  color?: string;
+
+  /**
+   * Optional label for accessibility
+   */
+  label?: string;
+}
 
 const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
   (
@@ -52,4 +72,4 @@ const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
 
 Spinner.displayName = 'Spinner';
 
-export default Spinner;
+export { Spinner };

@@ -16,20 +16,72 @@
  * ```
  */
 
-import { useEffect, useRef, forwardRef } from 'react';
+import { useEffect, useRef, forwardRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
-import type {
-  ModalProps,
-  ModalHeaderProps,
-  ModalBodyProps,
-  ModalFooterProps,
-} from './Modal.types';
 
-const Modal: React.FC<ModalProps> & {
-  Header: React.FC<ModalHeaderProps>;
-  Body: React.FC<ModalBodyProps>;
-  Footer: React.FC<ModalFooterProps>;
-} = ({
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export interface ModalProps {
+  /**
+   * Whether the modal is open
+   */
+  isOpen: boolean;
+
+  /**
+   * Callback when modal should close
+   */
+  onClose: () => void;
+
+  /**
+   * Modal content
+   */
+  children: ReactNode;
+
+  /**
+   * Modal title (optional)
+   */
+  title?: string;
+
+  /**
+   * Size of the modal
+   * @default 'md'
+   */
+  size?: ModalSize;
+
+  /**
+   * Close modal when clicking outside
+   * @default true
+   */
+  closeOnOverlayClick?: boolean;
+
+  /**
+   * Show close button
+   * @default true
+   */
+  showCloseButton?: boolean;
+
+  /**
+   * Custom className for modal content
+   */
+  className?: string;
+}
+
+export interface ModalHeaderProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface ModalBodyProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface ModalFooterProps {
+  children: ReactNode;
+  className?: string;
+}
+
+const ModalComponent: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
@@ -167,8 +219,10 @@ const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
 ModalFooter.displayName = 'Modal.Footer';
 
 // Attach subcomponents
-Modal.Header = ModalHeader;
-Modal.Body = ModalBody;
-Modal.Footer = ModalFooter;
+const Modal = Object.assign(ModalComponent, {
+  Header: ModalHeader,
+  Body: ModalBody,
+  Footer: ModalFooter,
+});
 
-export default Modal;
+export { Modal };

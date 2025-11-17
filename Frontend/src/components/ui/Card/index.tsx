@@ -14,15 +14,48 @@
  * ```
  */
 
-import { forwardRef } from 'react';
-import type {
-  CardProps,
-  CardHeaderProps,
-  CardBodyProps,
-  CardFooterProps,
-} from './Card.types';
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
+export type CardVariant = 'default' | 'bordered' | 'elevated';
+
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Card content
+   */
+  children: ReactNode;
+
+  /**
+   * Visual variant of the card
+   * @default 'default'
+   */
+  variant?: CardVariant;
+
+  /**
+   * Add hover effect
+   * @default false
+   */
+  hoverable?: boolean;
+
+  /**
+   * Add padding
+   * @default true
+   */
+  padding?: boolean;
+}
+
+export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export interface CardBodyProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+const CardComponent = forwardRef<HTMLDivElement, CardProps>(
   (
     {
       children,
@@ -63,7 +96,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
   }
 );
 
-Card.displayName = 'Card';
+CardComponent.displayName = 'Card';
 
 // Card Header subcomponent
 const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
@@ -113,10 +146,10 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
 CardFooter.displayName = 'Card.Footer';
 
 // Attach subcomponents to Card
-const CardWithSubcomponents = Object.assign(Card, {
+const Card = Object.assign(CardComponent, {
   Header: CardHeader,
   Body: CardBody,
   Footer: CardFooter,
 });
 
-export default CardWithSubcomponents;
+export { Card };

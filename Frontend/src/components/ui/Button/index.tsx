@@ -12,9 +12,53 @@
  * ```
  */
 
-import { forwardRef } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
-import type { ButtonProps } from './Button.types';
+
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * Visual variant of the button
+   * @default 'primary'
+   */
+  variant?: ButtonVariant;
+
+  /**
+   * Size of the button
+   * @default 'md'
+   */
+  size?: ButtonSize;
+
+  /**
+   * Button content
+   */
+  children: ReactNode;
+
+  /**
+   * Optional icon to display before the text
+   */
+  icon?: ReactNode;
+
+  /**
+   * Make button full width
+   * @default false
+   */
+  fullWidth?: boolean;
+
+  /**
+   * Disable button
+   * @default false
+   */
+  disabled?: boolean;
+
+  /**
+   * Loading state
+   * @default false
+   */
+  loading?: boolean;
+}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -87,4 +131,4 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export default Button;
+export { Button };

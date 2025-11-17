@@ -12,8 +12,33 @@
  * ```
  */
 
-import { forwardRef } from 'react';
-import { type SkeletonProps } from './Skeleton.types';
+import { forwardRef, type HTMLAttributes } from 'react';
+
+export type SkeletonVariant = 'text' | 'circular' | 'rectangular';
+
+export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Shape variant of the skeleton
+   * @default 'rectangular'
+   */
+  variant?: SkeletonVariant;
+
+  /**
+   * Width of the skeleton (CSS value)
+   */
+  width?: string | number;
+
+  /**
+   * Height of the skeleton (CSS value)
+   */
+  height?: string | number;
+
+  /**
+   * Enable animation
+   * @default true
+   */
+  animate?: boolean;
+}
 
 const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   (
@@ -64,4 +89,4 @@ const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
 
 Skeleton.displayName = 'Skeleton';
 
-export default Skeleton;
+export { Skeleton };

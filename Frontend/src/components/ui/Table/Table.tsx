@@ -23,7 +23,7 @@
 import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import type { TableProps, SortConfig } from './Table.types';
-import Skeleton from '../Skeleton';
+import { Skeleton } from '../Skeleton';
 import Pagination from '../Pagination';
 
 function Table<T>({
