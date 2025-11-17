@@ -1,4 +1,5 @@
-﻿using Backend.Models;
+﻿using Backend.DTOs;
+using Backend.Models;
 using Backend.Services.CatalogoService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Catalogo>> GetAllCatalogos()
+        public ActionResult<List<TipoCatalogo>> GetAllCatalogos()
         {
             try
             {

@@ -1,5 +1,7 @@
 ﻿using Backend.Context;
+using Backend.DTOs;
 using Backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.CatalogoService
 {
@@ -10,12 +12,13 @@ namespace Backend.Services.CatalogoService
         {
             _context = context;
         }
-        public List<Catalogo> GetAllCatalogos()
+        public List<TipoCatalogo> GetAllCatalogos()
         {
             try
             {
-                var catalogo = _context.Catalogos
-                    .OrderBy(c => c.NombreCatalogo)
+                var catalogo = _context.TipoCatalogos
+                    .OrderBy(tc => tc.IdTipoCatalogo)
+                    .Include(c => c.Catalogos)
                     .ToList();
                 return catalogo;
             }
