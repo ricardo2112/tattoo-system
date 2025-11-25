@@ -1,23 +1,30 @@
-/**
- * App Component
- *
- * Main application component that provides routing.
- */
+// Import Dependencies
+import { RouterProvider } from "react-router";
 
-import { useEffect } from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import { useThemeStore } from './stores';
+// Local Imports
+import { AuthProvider } from "@/app/contexts/auth/Provider";
+import { BreakpointProvider } from "@/app/contexts/breakpoint/Provider";
+import { LocaleProvider } from "@/app/contexts/locale/Provider";
+import { SidebarProvider } from "@/app/contexts/sidebar/Provider";
+import { ThemeProvider } from "@/app/contexts/theme/Provider";
+import router from "./app/router/router";
+
+// ----------------------------------------------------------------------
 
 function App() {
-  const { initTheme } = useThemeStore();
-
-  // Initialize theme on app load
-  useEffect(() => {
-    initTheme();
-  }, [initTheme]);
-
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <LocaleProvider>
+          <BreakpointProvider>
+            <SidebarProvider>
+              <RouterProvider router={router} />
+            </SidebarProvider>
+          </BreakpointProvider>
+        </LocaleProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
 }
 
 export default App;

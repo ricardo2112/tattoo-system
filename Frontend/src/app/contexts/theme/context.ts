@@ -10,7 +10,7 @@ import {
   ThemeConfig,
   ThemeLayout,
   ThemeMode,
-} from "@/configs/@types/theme";
+} from "@/@types/theme";
 
 export interface ThemeContextValue extends ThemeConfig {
   isDark: boolean;

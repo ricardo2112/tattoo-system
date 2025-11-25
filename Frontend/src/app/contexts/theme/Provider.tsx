@@ -13,7 +13,7 @@ import {
   ThemeConfig,
   ThemeLayout,
   ThemeMode,
-} from "@/configs/@types/theme";
+} from "@/@types/theme";
 import { defaultTheme } from "@/configs/theme";
 import { colors } from "@/constants/colors";
 
