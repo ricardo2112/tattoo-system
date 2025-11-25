@@ -3,12 +3,11 @@ import {
   HomeIcon,
   UsersIcon,
   CalendarIcon,
-  ChartBarIcon,
   Cog6ToothIcon,
   SparklesIcon,
   CubeIcon,
   CurrencyDollarIcon,
-} from "@heroicons/react/24/outline";
+} from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import {
@@ -36,15 +35,15 @@ export default function Sidebar() {
   const { t } = useTranslation();
 
   const navigation: NavItem[] = [
-    { nameKey: "navigation.items.home", path: "/module/home", icon: HomeIcon, category: "main" },
-    { nameKey: "navigation.items.appointments", path: "/module/citas", icon: CalendarIcon, category: "main" },
-    { nameKey: "navigation.items.clients", path: "/module/clientes", icon: UsersIcon, category: "main" },
-    { nameKey: "navigation.items.tattoos", path: "/module/tatuajes", icon: SparklesIcon, category: "main" },
-    { nameKey: "navigation.items.piercings", path: "/module/piercings", icon: SparklesIcon, category: "main" },
-    { nameKey: "navigation.items.laserRemoval", path: "/module/laser", icon: SparklesIcon, category: "main" },
-    { nameKey: "navigation.items.inventory", path: "/module/inventario", icon: CubeIcon, category: "management" },
-    { nameKey: "navigation.items.finances", path: "/module/finanzas", icon: CurrencyDollarIcon, category: "management" },
-    { nameKey: "navigation.items.users", path: "/module/usuarios", icon: UsersIcon, category: "management" },
+    { nameKey: "navigation.items.home", path: "/modules/home", icon: HomeIcon, category: "main" },
+    { nameKey: "navigation.items.appointments", path: "/modules/citas", icon: CalendarIcon, category: "main" },
+    { nameKey: "navigation.items.clients", path: "/modules/clientes", icon: UsersIcon, category: "main" },
+    { nameKey: "navigation.items.tattoos", path: "/modules/tatuajes", icon: SparklesIcon, category: "main" },
+    { nameKey: "navigation.items.piercings", path: "/modules/piercings", icon: SparklesIcon, category: "main" },
+    { nameKey: "navigation.items.laserRemoval", path: "/modules/laser", icon: SparklesIcon, category: "main" },
+    { nameKey: "navigation.items.inventory", path: "/modules/inventario", icon: CubeIcon, category: "management" },
+    { nameKey: "navigation.items.finances", path: "/modules/finanzas", icon: CurrencyDollarIcon, category: "management" },
+    { nameKey: "navigation.items.users", path: "/modules/usuarios", icon: UsersIcon, category: "management" },
     { nameKey: "navigation.items.settings", path: "/settings/general", icon: Cog6ToothIcon, category: "settings" },
   ];
 

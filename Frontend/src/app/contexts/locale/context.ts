@@ -1,8 +1,11 @@
 import { createSafeContext } from "@/utils/createSafeContext";
+import { locales } from "@/languages/langs";
+
+export type LocaleKey = keyof typeof locales;
 
 export interface LocaleContextValue {
-  locale: string;
-  setLocale: (locale: string) => void;
+  locale: LocaleKey;
+  setLocale: (locale: LocaleKey) => void;
   direction: "ltr" | "rtl";
 }
 

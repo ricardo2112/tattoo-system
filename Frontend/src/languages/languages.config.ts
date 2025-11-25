@@ -41,14 +41,6 @@ i18n
  */
 export const changeLanguage = async (lang: keyof typeof languages) => {
   await i18n.changeLanguage(lang);
-
-  // Update document direction for RTL languages
-  const languageConfig = languages[lang];
-  if (languageConfig.dir === 'rtl') {
-    document.documentElement.dir = 'rtl';
-  } else {
-    document.documentElement.dir = 'ltr';
-  }
 };
 
 export default i18n;
