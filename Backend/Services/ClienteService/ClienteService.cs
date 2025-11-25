@@ -27,7 +27,7 @@ namespace Backend.Services.ClienteService
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener los clientes", ex);
+                throw new Exception($"Error al obtener los clientes: {ex}");
             }
         }
 
@@ -78,6 +78,7 @@ namespace Backend.Services.ClienteService
                     Nombre = cliente.Nombre,
                     Apellido = cliente.Apellido,
                     FechaNacimiento = cliente.FechaNacimiento,
+                    Nacionalidad = cliente.Nacionalidad,
                     Telefono = cliente.Telefono,
                     Email = cliente.Email,
                     Redes = cliente.Redes,
@@ -130,6 +131,7 @@ namespace Backend.Services.ClienteService
                 clienteExistente.Nombre = cliente.Nombre;
                 clienteExistente.Apellido = cliente.Apellido;
                 clienteExistente.FechaNacimiento = cliente.FechaNacimiento;
+                clienteExistente.Nacionalidad = cliente.Nacionalidad;
                 clienteExistente.Telefono = cliente.Telefono;
                 clienteExistente.Email = cliente.Email;
                 clienteExistente.Redes = cliente.Redes;

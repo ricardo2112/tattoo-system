@@ -12,15 +12,26 @@ namespace Backend.Services.CatalogoService
         {
             _context = context;
         }
-        public List<TipoCatalogo> GetAllCatalogos()
+        public List<TipoCatalogoDto> GetAllCatalogos()
         {
             try
             {
-                var catalogo = _context.TipoCatalogos
+                var catalogos = _context.TipoCatalogos
                     .OrderBy(tc => tc.IdTipoCatalogo)
                     .Include(c => c.Catalogos)
+                    .Select(tc => new TipoCatalogoDto
+                    {
+                        IdTipoCatalogo = tc.IdTipoCatalogo,
+                        NombreTipo = tc.NombreTipoCatalogo,
+                        Catalogos = tc.Catalogos.Select(c => new CatalogoDto
+                        {
+                            IdCatalogo = c.IdCatalogo,
+                            IdTipoCatalogo = c.IdTipoCatalogo,
+                            NombreCatalogo = c.NombreCatalogo
+                        }).ToList()
+                    })
                     .ToList();
-                return catalogo;
+                return catalogos;
             }
             catch (Exception ex)
             {

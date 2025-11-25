@@ -26,6 +26,9 @@ namespace Backend.Models
         [Column("fecha_nacimiento")]
         public DateTime? FechaNacimiento { get; set; }
 
+        [Column("nacionalidad")]
+        public string? Nacionalidad { get; set; }
+
         [Column("telefono")]
         [StringLength(20)]
         public string? Telefono { get; set; }
@@ -39,15 +42,15 @@ namespace Backend.Models
         public string? Redes { get; set; }
 
         [Column("condicion_medica")]
-        [StringLength(50)]
+        [StringLength(100)]
         public string? CondicionMedica { get; set; }
 
         [Column("enfermedad_piel")]
-        [StringLength(50)]
+        [StringLength(100)]
         public string? EnfermedadPiel { get; set; }
 
         [Column("deporte")]
-        [StringLength(20)]
+        [StringLength(100)]
         public string? Deporte { get; set; }
 
         [Column("referencia")]
@@ -55,7 +58,7 @@ namespace Backend.Models
         public string? Referencia { get; set; }
 
         [Column("observaciones")]
-        [StringLength(60)]
+        [StringLength(200)]
         public string? Observaciones { get; set; }
 
         [Column("fecha_creacion")]

@@ -4,6 +4,7 @@ using Backend.Services.AuthenticationService;
 using Backend.Services.CatalogoService;
 using Backend.Services.CitaService;
 using Backend.Services.ClienteService;
+using Backend.Services.CountryService;
 using Backend.Services.PagoService;
 using Backend.Services.TatuajeService;
 using Backend.Services.TutorService;
@@ -40,7 +41,7 @@ builder.Services.AddCors(options =>
 // Servicios
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<IJWTAuthentication, JWTAuthentication>();  
+builder.Services.AddScoped<IJWTAuthentication, JWTAuthentication>();
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<ITutorService, TutorService>();
@@ -48,7 +49,14 @@ builder.Services.AddScoped<ITatuajeService, TatuajeService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICitaService, CitaService>();
 
-builder.Services.AddControllers();
+// HttpClient para servicios externos
+builder.Services.AddHttpClient<ICountryService, CountryService>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

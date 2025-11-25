@@ -17,7 +17,7 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<TipoCatalogo>> GetAllCatalogos()
+        public ActionResult<List<TipoCatalogoDto>> GetAllCatalogos()
         {
             try
             {
@@ -102,7 +102,7 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("tipoCatalogo/{id}")]
+        [HttpGet("tipoCatalogo/{idTipo}")]
         public ActionResult<List<string>> GetCatalogoByTipo(int idTipo)
         {
             try
