@@ -1,117 +1,98 @@
-/**
- * Badge Component
- *
- * A small label component for displaying status, counts, or tags.
- * Supports multiple variants, sizes, and a dot indicator mode.
- *
- * @example
- * ```tsx
- * <Badge variant="success" size="md">Active</Badge>
- * <Badge variant="danger" dot>3</Badge>
- * ```
- */
+// Import Dependencies
+import React, { ElementType, ForwardedRef, forwardRef, ReactNode } from "react";
+import clsx from "clsx";
 
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
+// Local Imports
+import { ColorType } from "@/constants/app";
+import { setThisClass } from "@/utils/setThisClass";
+import {
+  PolymorphicComponentProps,
+  PolymorphicRef,
+} from "@/@types/polymorphic";
 
-export type BadgeVariant =
-  | 'default'
-  | 'primary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info';
+// ----------------------------------------------------------------------
 
-export type BadgeSize = 'sm' | 'md' | 'lg';
+type Variant = "filled" | "outlined" | "soft";
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  /**
-   * Badge content
-   */
-  children: ReactNode;
+type BadgeOwnProps<T extends ElementType = "div"> = {
+  component?: T;
+  className?: string;
+  children?: React.ReactNode;
+  variant?: Variant;
+  color?: ColorType;
+  unstyled?: boolean;
+  isGlow?: boolean;
+};
 
-  /**
-   * Visual variant of the badge
-   * @default 'default'
-   */
-  variant?: BadgeVariant;
+export type BadgeProps<E extends ElementType = "div"> =
+  PolymorphicComponentProps<E, BadgeOwnProps<E>>;
 
-  /**
-   * Size of the badge
-   * @default 'md'
-   */
-  size?: BadgeSize;
+const variants: Record<Variant, string> = {
+  filled: "text-white bg-this",
+  outlined:
+    "border border-this/30 text-this dark:border-this-lighter/30 dark:text-this-lighter",
+  soft: "text-this-darker bg-this-darker/[0.07] dark:text-this-lighter dark:bg-this-lighter/10",
+};
 
-  /**
-   * Use dot indicator instead of full background
-   * @default false
-   */
-  dot?: boolean;
-}
+const neutralVariants: Record<Variant, string> = {
+  filled: "bg-gray-200 text-gray-900 dark:bg-surface-2 dark:text-dark-50",
+  outlined:
+    "border border-gray-300 text-gray-900 dark:border-surface-1 dark:text-dark-50",
+  soft: "bg-gray-200/30 text-gray-900 dark:bg-dark-500/30 dark:text-dark-50",
+};
 
-const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  (
-    {
-      children,
-      variant = 'default',
-      size = 'md',
-      dot = false,
-      className = '',
-      ...props
-    },
-    ref
+const BadgeInner = forwardRef(
+  <E extends ElementType = "div">(
+    props: any,
+    ref: ForwardedRef<any>,
   ) => {
-    // Base styles
-    const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-full whitespace-nowrap';
-
-    // Variant styles
-    const variantStyles: Record<typeof variant, string> = {
-      default:
-        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-      primary:
-        'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300',
-      success:
-        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      warning:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-      danger:
-        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-      info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    };
-
-    // Size styles
-    const sizeStyles: Record<typeof size, string> = {
-      sm: 'px-2 py-0.5 text-xs',
-      md: 'px-2.5 py-1 text-sm',
-      lg: 'px-3 py-1.5 text-base',
-    };
-
-    // Dot indicator styles
-    const dotColors: Record<typeof variant, string> = {
-      default: 'bg-gray-500',
-      primary: 'bg-primary-500',
-      success: 'bg-green-500',
-      warning: 'bg-yellow-500',
-      danger: 'bg-red-500',
-      info: 'bg-blue-500',
-    };
-
-    // Combine all styles
-    const combinedStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
+    const {
+      component,
+      className,
+      unstyled,
+      variant = "filled",
+      color = "neutral",
+      isGlow,
+      children,
+      ...rest
+    } = props as BadgeProps<E>;
+    const Component = component || "div";
 
     return (
-      <span ref={ref} className={combinedStyles} {...props}>
-        {dot && (
-          <span
-            className={`mr-1.5 h-1.5 w-1.5 rounded-full ${dotColors[variant]}`}
-          />
+      <Component
+        className={clsx(
+          "badge-base",
+          !unstyled && [
+            "badge",
+            color === "neutral"
+              ? [
+                neutralVariants[variant],
+                isGlow &&
+                "dark:shadow-dark-450/50 shadow-lg shadow-gray-200/50",
+              ]
+              : [
+                setThisClass(color),
+                variants[variant],
+                isGlow &&
+                "shadow-this/50 dark:shadow-this-light/50 shadow-lg",
+              ],
+          ],
+          className,
         )}
+        ref={ref}
+        {...rest}
+      >
         {children}
-      </span>
+      </Component>
     );
-  }
+  },
 );
 
-Badge.displayName = 'Badge';
+type BadgeComponent = (<E extends ElementType = "div">(
+  props: BadgeProps<E> & { ref?: PolymorphicRef<E> },
+) => ReactNode) & { displayName?: string };
+
+const Badge = BadgeInner as BadgeComponent;
+Badge.displayName = "Badge";
 
 export { Badge };

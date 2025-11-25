@@ -1,95 +1,130 @@
-/**
- * TextArea Component
- *
- * A flexible textarea component with label and error handling.
- * Fully compatible with react-hook-form.
- *
- * @example
- * ```tsx
- * <TextArea
- *   label="Description"
- *   placeholder="Enter description"
- *   rows={5}
- *   error={errors.description?.message}
- *   {...register('description')}
- * />
- * ```
- */
+// Import Dependencies
+import { ElementType, ReactNode, HTMLAttributes, ForwardedRef } from "react";
+import clsx from "clsx";
 
-import { forwardRef } from 'react';
-import type { TextAreaProps } from './TextArea.types';
+// Local Imports
+import { useId } from "@/hooks";
+import { InputErrorMsg } from "./InputErrorMsg";
+import {
+  PolymorphicComponentProps,
+  PolymorphicRef,
+} from "@/@types/polymorphic";
 
-const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  (
-    {
-      label,
-      error,
-      helperText,
-      fullWidth = false,
-      rows = 4,
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
-    const hasError = !!error;
+// ----------------------------------------------------------------------
 
-    // Wrapper classes
-    const wrapperClasses = fullWidth ? 'w-full' : '';
+type TextareaOwnProps<T extends ElementType = "textarea"> = {
+  component?: T;
+  label?: ReactNode;
+  description?: ReactNode;
+  classNames?: {
+    root?: string;
+    label?: string;
+    labelText?: string;
+    wrapper?: string;
+    input?: string;
+    error?: string;
+    description?: string;
+  };
+  disabled?: boolean;
+  error?: boolean | ReactNode;
+  unstyled?: boolean;
+  rootProps?: HTMLAttributes<HTMLDivElement>;
+  labelProps?: HTMLAttributes<HTMLLabelElement>;
+  id?: string;
+  className?: string;
+};
 
-    // TextArea classes
-    const textAreaClasses = `
-      w-full px-3 py-2 text-sm
-      bg-background border rounded-lg
-      resize-vertical
-      transition-colors duration-200
-      focus:outline-none focus:ring-2 focus:ring-offset-0
-      disabled:opacity-50 disabled:cursor-not-allowed
-      ${hasError
-        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-        : 'border-input focus:border-primary-500 focus:ring-primary-500'
-      }
-      ${className}
-    `;
+export type TextareaProps<E extends ElementType = "textarea"> =
+  PolymorphicComponentProps<E, TextareaOwnProps<E>>;
 
-    return (
-      <div className={wrapperClasses}>
-        {/* Label */}
-        {label && (
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+const TextareaInner = <C extends ElementType = "textarea">(
+  props: any,
+  ref: ForwardedRef<any>,
+) => {
+  const {
+    component,
+    label,
+    description,
+    className,
+    classNames = {},
+    error,
+    unstyled,
+    rootProps,
+    labelProps,
+    id,
+    disabled,
+    ...rest
+  } = props as TextareaProps<C>;
+  const Component = component || "textarea";
+  const inputId = useId(id, "textarea");
+
+  return (
+    <div className={clsx("input-root", classNames.root)} {...rootProps}>
+      {label && (
+        <label
+          htmlFor={inputId}
+          className={clsx("input-label", classNames.label)}
+          {...labelProps}
+        >
+          <span className={clsx("input-label", classNames.labelText)}>
             {label}
-            {props.required && <span className="ml-1 text-red-500">*</span>}
-          </label>
-        )}
+          </span>
+        </label>
+      )}
 
-        {/* TextArea */}
-        <textarea
+      <div
+        className={clsx(
+          "input-wrapper relative",
+          label && "mt-1.5",
+          classNames.wrapper,
+        )}
+      >
+        <Component
           ref={ref}
-          rows={rows}
-          className={textAreaClasses}
-          aria-invalid={hasError}
-          aria-describedby={
-            error ? `${props.id}-error` : helperText ? `${props.id}-helper` : undefined
-          }
-          {...props}
+          id={inputId}
+          className={clsx(
+            "form-textarea-base",
+            !unstyled && [
+              "form-textarea",
+              error
+                ? "border-error dark:border-error-lighter"
+                : [
+                    disabled
+                      ? "bg-gray-150 dark:border-dark-500 dark:bg-dark-600 cursor-not-allowed border-gray-300 opacity-60"
+                      : "peer focus:border-primary-600 dark:border-dark-450 dark:hover:border-dark-400 dark:focus:border-primary-500 border-gray-300 hover:border-gray-400",
+                  ],
+            ],
+            className,
+            classNames.input,
+          )}
+          {...(rest as any)}
         />
-
-        {/* Helper text or error message */}
-        {(helperText || error) && (
-          <p
-            id={error ? `${props.id}-error` : `${props.id}-helper`}
-            className={`mt-1.5 text-sm ${
-              hasError ? 'text-red-600' : 'text-muted-foreground'
-            }`}
-          >
-            {error || helperText}
-          </p>
-        )}
       </div>
-    );
-  }
-);
+      <InputErrorMsg
+        when={!!(error && typeof error !== "boolean")}
+        className={classNames.error}
+      >
+        {error}
+      </InputErrorMsg>
+      {description && (
+        <span
+          className={clsx(
+            "input-description dark:text-dark-300 mt-1 text-xs text-gray-400",
+            classNames.description,
+          )}
+        >
+          {description}
+        </span>
+      )}
+    </div>
+  );
+};
 
-TextArea.displayName = 'TextArea';
+type TextareaComponent = (<E extends ElementType = "textarea">(
+  props: TextareaProps<E> & { ref?: PolymorphicRef<E> },
+) => ReactNode) & { displayName?: string };
 
-export default TextArea;
+const Textarea = TextareaInner as TextareaComponent;
+Textarea.displayName = "Textarea";
+
+export { Textarea };

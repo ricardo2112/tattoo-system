@@ -1,134 +1,113 @@
-/**
- * Button Component
- *
- * A versatile button component with multiple variants and sizes.
- * Supports icons, loading states, and full-width layout.
- *
- * @example
- * ```tsx
- * <Button variant="primary" size="md" icon={<Icon />}>
- *   Click me
- * </Button>
- * ```
- */
+// Import Dependencies
+import { ElementType, ReactNode, forwardRef, ForwardedRef } from "react";
+import clsx from "clsx";
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
+// Local Imports
+import { ColorType } from "@/constants/app";
+import { setThisClass } from "@/utils/setThisClass";
+import {
+  PolymorphicRef,
+  PolymorphicComponentProps,
+} from "@/@types/polymorphic";
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+// ----------------------------------------------------------------------
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /**
-   * Visual variant of the button
-   * @default 'primary'
-   */
-  variant?: ButtonVariant;
+type Variant = "filled" | "outlined" | "soft" | "flat";
 
-  /**
-   * Size of the button
-   * @default 'md'
-   */
-  size?: ButtonSize;
-
-  /**
-   * Button content
-   */
-  children: ReactNode;
-
-  /**
-   * Optional icon to display before the text
-   */
-  icon?: ReactNode;
-
-  /**
-   * Make button full width
-   * @default false
-   */
-  fullWidth?: boolean;
-
-  /**
-   * Disable button
-   * @default false
-   */
-  disabled?: boolean;
-
-  /**
-   * Loading state
-   * @default false
-   */
-  loading?: boolean;
+type ButtonOwnProps<E extends ElementType = "button"> = {
+  children?: ReactNode;
+  color?: ColorType;
+  isIcon?: boolean;
+  variant?: Variant;
+  unstyled?: boolean;
+  isGlow?: boolean;
+  component?: E;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      variant = 'primary',
-      size = 'md',
-      children,
-      icon,
-      fullWidth = false,
-      disabled = false,
-      loading = false,
-      className = '',
-      ...props
-    },
-    ref
+export type ButtonProps<E extends ElementType = "button"> =
+  PolymorphicComponentProps<E, ButtonOwnProps<E>>;
+
+const variants: Record<Variant, string> = {
+  filled:
+    "bg-this text-white hover:bg-this-darker focus:bg-this-darker active:bg-this-darker/90 disabled:bg-this-light dark:disabled:bg-this-darker",
+  soft: "text-this-darker bg-this-darker/[.08] hover:bg-this-darker/[.15] focus:bg-this-darker/[.15] active:focus:bg-this-darker/20 dark:bg-this-lighter/10 dark:text-this-lighter dark:hover:bg-this-lighter/20 dark:focus:bg-this-lighter/20 dark:active:bg-this-lighter/25",
+  outlined:
+    "text-this-darker border border-this-darker hover:bg-this-darker/[.05] focus:bg-this-darker/[.05] active:bg-this-darker/10 dark:border-this-lighter dark:text-this-lighter dark:hover:bg-this-lighter/[.05] dark:focus:bg-this-lighter/[.05] dark:active:bg-this-lighter/10",
+  flat: "text-this-darker hover:bg-this-darker/[.08] focus:bg-this-darker/[.08] active:bg-this-darker/[.15] dark:text-this-lighter dark:hover:bg-this-lighter/10 dark:focus:bg-this-lighter/10 dark:active:bg-this-lighter/[.15]",
+};
+
+const neutralVariants: Record<Variant, string> = {
+  filled:
+    "bg-gray-150 text-gray-900 hover:bg-gray-200 focus:bg-gray-200 active:bg-gray-200/80 dark:bg-surface-2 dark:text-dark-50 dark:hover:bg-surface-1 dark:focus:bg-surface-1 dark:active:bg-surface-1/90",
+  soft: "bg-gray-150/30 text-gray-900 hover:bg-gray-200/[.15] focus:bg-gray-200/[.15] active:bg-gray-200/20 dark:bg-dark-500/30 dark:text-dark-50 dark:hover:bg-dark-450/[.15] dark:focus:bg-dark-450/[.15] dark:active:bg-dark-450/20",
+  outlined:
+    "border border-gray-300 hover:bg-gray-300/20 focus:bg-gray-300/20 text-gray-900 active:bg-gray-300/25 dark:text-dark-50 dark:hover:bg-dark-300/20 dark:focus:bg-dark-300/20 dark:active:bg-dark-300/25 dark:border-dark-450",
+  flat: "hover:bg-gray-300/20 focus:bg-gray-300/20 text-gray-700 active:bg-gray-300/25 dark:text-dark-200 dark:hover:bg-dark-300/10 dark:focus:bg-dark-300/10 dark:active:bg-dark-300/20",
+};
+
+const ButtonInner = forwardRef(
+  <E extends ElementType = "button">(
+    props: any,
+    ref: ForwardedRef<any>,
   ) => {
-    // Base styles
-    const baseStyles =
-      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const {
+      component,
+      className,
+      children,
+      color = "neutral",
+      isIcon = false,
+      variant = "filled",
+      unstyled = false,
+      isGlow = false,
+      type: buttonType,
+      ...rest
+    } = props as ButtonProps<E>;
+    const Component = component || "button";
+    const { disabled, ...propsRest } = rest;
 
-    // Variant styles
-    const variantStyles: Record<typeof variant, string> = {
-      primary:
-        'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 active:bg-primary-800',
-      secondary:
-        'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600',
-      outline:
-        'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500 dark:border-primary-500 dark:text-primary-400 dark:hover:bg-primary-950',
-      ghost:
-        'text-gray-700 hover:bg-gray-100 focus:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-800',
-      danger:
-        'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 active:bg-red-800',
-    };
-
-    // Size styles
-    const sizeStyles: Record<typeof size, string> = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg',
-    };
-
-    // Width styles
-    const widthStyles = fullWidth ? 'w-full' : '';
-
-    // Combine all styles
-    const combinedStyles = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${className}`;
+    const type = Component === "button" ? buttonType || "button" : undefined;
 
     return (
-      <button
+      <Component
         ref={ref}
-        className={combinedStyles}
-        disabled={disabled || loading}
-        {...props}
-      >
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Loading...</span>
-          </>
-        ) : (
-          <>
-            {icon && <span className="flex-shrink-0">{icon}</span>}
-            {children}
-          </>
+        type={type}
+        className={clsx(
+          "btn-base",
+          !unstyled
+            ? [
+              "btn",
+              isIcon && "shrink-0 p-0",
+              color === "neutral"
+                ? [
+                  neutralVariants[variant],
+                  isGlow &&
+                  "dark:shadow-dark-450/5 shadow-lg shadow-gray-200/50",
+                ]
+                : [
+                  setThisClass(color),
+                  variants[variant],
+                  isGlow &&
+                  "shadow-soft shadow-this/50 dark:shadow-this/50 dark:shadow-lg",
+                ],
+            ]
+            : color !== "neutral" && setThisClass(color),
+          className,
         )}
-      </button>
+        disabled={Component === "button" ? disabled : undefined}
+        data-disabled={disabled}
+        {...propsRest}
+      >
+        {children}
+      </Component>
     );
-  }
+  },
 );
 
-Button.displayName = 'Button';
+type ButtonComponent = (<E extends ElementType = "button">(
+  props: ButtonProps<E> & { ref?: PolymorphicRef<E> },
+) => ReactNode) & { displayName?: string };
+
+const Button = ButtonInner as ButtonComponent;
+Button.displayName = "Button";
 
 export { Button };
