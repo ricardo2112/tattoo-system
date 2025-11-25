@@ -8,12 +8,10 @@ import Header from "@/components/template/Header";
  */
 export function AppLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
       <Header />
-      <main className="w-full p-6 pt-6">
-        <div className="mx-auto max-w-7xl">
-          <Outlet />
-        </div>
+      <main className="ml-64 pt-16 min-h-screen overflow-x-hidden">
+        <Outlet />
       </main>
     </div>
   );

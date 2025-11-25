@@ -10,7 +10,7 @@ import flatpickrCSS from "flatpickr/dist/themes/light.css?inline";
 import { Input, InputProps } from "@/components/ui";
 import { useLocaleContext } from "@/app/contexts/locale/context";
 import { useMergedRef } from "@/hooks";
-import { locales } from "@/i18n/langs";
+import { locales } from "@/languages/langs";
 import {
   injectStyles,
   insertStylesToHead,

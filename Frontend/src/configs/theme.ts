@@ -15,7 +15,7 @@ export const defaultTheme: ThemeConfig = {
   themeMode: "system",
   isMonochrome: false,
   themeLayout: "sideblock",
-  cardSkin: "bordered",
+  cardSkin: "shadow",
 
   darkColorScheme: {
     name: DEFAULT_DARK_COLOR,

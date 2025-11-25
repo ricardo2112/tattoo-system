@@ -1,5 +1,15 @@
 {
+  "app": {
+    "name": "Studio Management v2.0",
+    "tagline": "Tattoo Z Studio: Tinta hoy, leyenda siempre"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
   "common": {
+    "welcome": "Bienvenido de vuelta",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
@@ -22,56 +32,65 @@
     "details": "Detalles",
     "back": "Atrás",
     "next": "Siguiente",
-    "previous": "Anterior"
+    "previous": "Anterior",
+    "comingSoon": "Próximamente..."
   },
   "navigation": {
-    "dashboard": "Panel de Control",
-    "sales": "Ventas",
-    "crm": "Análisis CRM",
-    "orders": "Pedidos",
-    "crypto": "Criptomonedas",
-    "banking": "Banca",
-    "personal": "Personal",
-    "cms": "Análisis CMS",
-    "influencer": "Influencer",
-    "travel": "Viajes",
-    "teacher": "Profesor",
-    "education": "Educación",
-    "authors": "Autores",
-    "doctor": "Doctor",
-    "clients": "Clientes",
-    "catalogs": "Catálogos",
-    "tattoos": "Tatuajes",
-    "piercings": "Piercings",
-    "users": "Usuarios",
-    "settings": "Configuración"
+    "categories": {
+      "main": "Principal",
+      "management": "Gestión",
+      "settings": "Sistema"
+    },
+    "items": {
+      "home": "Inicio",
+      "appointments": "Citas",
+      "clients": "Clientes",
+      "tattoos": "Tatuajes",
+      "piercings": "Piercings",
+      "laserRemoval": "Borrado Láser",
+      "inventory": "Inventario",
+      "finances": "Finanzas",
+      "users": "Usuarios",
+      "settings": "Configuración"
+    }
   },
-  "dashboard": {
-    "title": "Panel de Control",
-    "welcome": "¡Bienvenido de nuevo!",
-    "overview": "Resumen",
-    "sales": "Ventas",
-    "customers": "Clientes",
-    "products": "Productos",
-    "revenue": "Ingresos",
-    "salesReport": "Reporte de Ventas",
-    "recentOrders": "Pedidos Recientes",
-    "topProducts": "Productos Destacados",
-    "customerGrowth": "Crecimiento de Clientes",
-    "totalSales": "Ventas Totales",
-    "thisMonth": "Este Mes",
-    "lastMonth": "Mes Pasado",
-    "viewAll": "Ver Todo",
-    "viewDetails": "Ver Detalles"
+  "modules": {
+    "home": {
+      "mainMenu": "Menu Principal",
+      "quickActions": {
+        "clients": {
+          "title": "Pacientes",
+          "description": "Información de pacientes",
+          "button": "Acceder"
+        },
+        "newSession": {
+          "title": "Nueva Sesión",
+          "description": "Iniciar sesión de terapia",
+          "button": "Iniciar"
+        },
+        "statistics": {
+          "title": "Estadísticas",
+          "description": "Ver historial y estadísticas",
+          "button": "Visualizar"
+        }
+      }
+    },
+    "clients": {
+      "title": "Clientes",
+      "description": "Gestión de clientes y su información",
+      "comingSoon": "Módulo de clientes próximamente..."
+    },
+    "appointments": {
+      "title": "Citas",
+      "description": "Gestión de citas y calendario",
+      "comingSoon": "Módulo de citas próximamente..."
+    }
   },
   "settings": {
     "title": "Configuración",
     "appearance": "Apariencia",
     "theme": "Tema",
     "themeMode": "Modo de Tema",
-    "system": "Sistema",
-    "light": "Claro",
-    "dark": "Oscuro",
     "primaryColor": "Color Primario",
     "blue": "Azul",
     "purple": "Morado",

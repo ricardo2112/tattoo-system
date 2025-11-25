@@ -11,15 +11,11 @@ import { initReactI18next } from 'react-i18next';
 // Import translation files
 import en from './locales/en.json';
 import es from './locales/es.json';
-import ar from './locales/ar.json';
-import zh from './locales/zh.json';
 
 // Available languages
 export const languages = {
   en: { name: 'English', flag: '🇺🇸', nativeName: 'English' },
   es: { name: 'Spanish', flag: '🇪🇸', nativeName: 'Español' },
-  ar: { name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية', dir: 'rtl' },
-  zh: { name: 'Chinese', flag: '🇨🇳', nativeName: '中文' },
 } as const;
 
 // i18n initialization
@@ -29,11 +25,9 @@ i18n
     resources: {
       en: { translation: en },
       es: { translation: es },
-      ar: { translation: ar },
-      zh: { translation: zh },
     },
-    lng: 'en', // default language
-    fallbackLng: 'en', // fallback language
+    lng: 'es', // default language
+    fallbackLng: 'es', // fallback language
     interpolation: {
       escapeValue: false, // react already safes from xss
     },

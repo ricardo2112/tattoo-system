@@ -9,16 +9,12 @@ import Sidebar from "@/components/template/Sidebar";
  */
 export function DynamicLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
+      <Sidebar />
       <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="ml-64 w-full p-6 pt-6">
-          <div className="mx-auto max-w-7xl">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+      <main className="ml-64 pt-16 min-h-screen overflow-x-hidden">
+        <Outlet />
+      </main>
     </div>
   );
 }

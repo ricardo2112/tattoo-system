@@ -1,5 +1,15 @@
 {
+  "app": {
+    "name": "Studio Management v2.0",
+    "tagline": "Tattoo Z Studio: Ink today, legend forever"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
   "common": {
+    "welcome": "Welcome back",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -22,56 +32,65 @@
     "details": "Details",
     "back": "Back",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "comingSoon": "Coming soon..."
   },
   "navigation": {
-    "dashboard": "Dashboard",
-    "sales": "Sales",
-    "crm": "CRM Analytics",
-    "orders": "Orders",
-    "crypto": "Cryptocurrency",
-    "banking": "Banking",
-    "personal": "Personal",
-    "cms": "CMS Analytics",
-    "influencer": "Influencer",
-    "travel": "Travel",
-    "teacher": "Teacher",
-    "education": "Education",
-    "authors": "Authors",
-    "doctor": "Doctor",
-    "clients": "Clients",
-    "catalogs": "Catalogs",
-    "tattoos": "Tattoos",
-    "piercings": "Piercings",
-    "users": "Users",
-    "settings": "Settings"
+    "categories": {
+      "main": "Main",
+      "management": "Management",
+      "settings": "System"
+    },
+    "items": {
+      "home": "Home",
+      "appointments": "Appointments",
+      "clients": "Clients",
+      "tattoos": "Tattoos",
+      "piercings": "Piercings",
+      "laserRemoval": "Laser Removal",
+      "inventory": "Inventory",
+      "finances": "Finances",
+      "users": "Users",
+      "settings": "Settings"
+    }
   },
-  "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome back!",
-    "overview": "Overview",
-    "sales": "Sales",
-    "customers": "Customers",
-    "products": "Products",
-    "revenue": "Revenue",
-    "salesReport": "Sales Report",
-    "recentOrders": "Recent Orders",
-    "topProducts": "Top Products",
-    "customerGrowth": "Customer Growth",
-    "totalSales": "Total Sales",
-    "thisMonth": "This Month",
-    "lastMonth": "Last Month",
-    "viewAll": "View All",
-    "viewDetails": "View Details"
+  "modules": {
+    "home": {
+      "mainMenu": "Main Menu",
+      "quickActions": {
+        "clients": {
+          "title": "Clients",
+          "description": "Client information",
+          "button": "Access"
+        },
+        "newSession": {
+          "title": "New Session",
+          "description": "Start therapy session",
+          "button": "Start"
+        },
+        "statistics": {
+          "title": "Statistics",
+          "description": "View history and statistics",
+          "button": "View"
+        }
+      }
+    },
+    "clients": {
+      "title": "Clients",
+      "description": "Client management and information",
+      "comingSoon": "Clients module coming soon..."
+    },
+    "appointments": {
+      "title": "Appointments",
+      "description": "Appointment and calendar management",
+      "comingSoon": "Appointments module coming soon..."
+    }
   },
   "settings": {
     "title": "Settings",
     "appearance": "Appearance",
     "theme": "Theme",
     "themeMode": "Theme Mode",
-    "system": "System",
-    "light": "Light",
-    "dark": "Dark",
     "primaryColor": "Primary Color",
     "blue": "Blue",
     "purple": "Purple",

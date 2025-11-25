@@ -1,0 +1,38 @@
+import { Page } from "@/components/shared/Page";
+import { Card } from "@/components/ui";
+import { CalendarIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
+
+/**
+ * Citas page
+ * Manage appointments and schedules
+ */
+export default function Citas() {
+  const { t } = useTranslation();
+
+  return (
+    <Page title={t("modules.appointments.title")}>
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mb-6 flex items-center gap-4">
+          <div className="rounded-xl bg-green-500 bg-opacity-10 p-4">
+            <CalendarIcon className="h-8 w-8 text-green-500" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {t("modules.appointments.title")}
+            </h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {t("modules.appointments.description")}
+            </p>
+          </div>
+        </div>
+
+        <Card className="p-6">
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("modules.appointments.comingSoon")}
+          </p>
+        </Card>
+      </div>
+    </Page>
+  );
+}
