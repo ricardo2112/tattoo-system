@@ -101,5 +101,24 @@ namespace Backend.Controllers
                 return StatusCode(500, new { message = "Error al actualizar el catálogo", error = ex.Message });
             }
         }
+
+        [HttpGet("tipoCatalogo/{id}")]
+        public ActionResult<List<string>> GetCatalogoByTipo(int idTipo)
+        {
+            try
+            {
+                if (idTipo <= 0)
+                {
+                    return BadRequest(new { message = "El ID del TipoCatalogo debe ser un número positivo" });
+                }
+
+                var catalogos = _catalogoService.GetCatalogoByTipo(idTipo);
+                return Ok(catalogos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los catalogos", error = ex.Message });
+            }
+        }
     }
 }

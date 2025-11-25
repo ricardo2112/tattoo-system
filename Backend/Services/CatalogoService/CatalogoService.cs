@@ -141,5 +141,32 @@ namespace Backend.Services.CatalogoService
                 throw new Exception($"Error al actualizar el catálogo con ID {id}", ex);
             }
         }
+
+        public List<string> GetCatalogoByTipo(int idTipo)
+        {
+            try
+            {
+                var catalogos = _context.TipoCatalogos
+                    .Include(c => c.Catalogos)
+                    .Where(tc => tc.IdTipoCatalogo == idTipo)
+                    .SelectMany(tc => tc.Catalogos.Select(c => c.NombreCatalogo))
+                    .ToList();
+
+                if (!catalogos.Any())
+                {
+                    throw new KeyNotFoundException($"No se encontraron catálogos para el tipo con ID {idTipo}");
+                }
+
+                return catalogos;
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener los catálogos del tipo {idTipo}", ex);
+            }
+        }
     }
 }
