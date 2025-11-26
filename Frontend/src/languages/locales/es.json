@@ -51,6 +51,7 @@
       "inventory": "Inventario",
       "finances": "Finanzas",
       "users": "Usuarios",
+      "catalog": "Catálogos",
       "settings": "Configuración"
     }
   },
@@ -59,31 +60,74 @@
       "mainMenu": "Menu Principal",
       "quickActions": {
         "clients": {
-          "title": "Pacientes",
-          "description": "Información de pacientes",
+          "title": "Clientes",
+          "description": "Gestionar los clientes del sistema",
           "button": "Acceder"
         },
         "newSession": {
-          "title": "Nueva Sesión",
-          "description": "Iniciar sesión de terapia",
+          "title": "Tatuajes",
+          "description": "Gestiona las sesiones de tatuaje",
           "button": "Iniciar"
         },
         "statistics": {
-          "title": "Estadísticas",
-          "description": "Ver historial y estadísticas",
+          "title": "Piercings",
+          "description": "Gestiona las sesiones de tatuaje",
           "button": "Visualizar"
         }
       }
     },
     "clients": {
       "title": "Clientes",
-      "description": "Gestión de clientes y su información",
-      "comingSoon": "Módulo de clientes próximamente..."
+      "description": "Gestiona la información de tus clientes",
+      "comingSoon": "Módulo de clientes próximamente...",
+      "newClient": "Nuevo Cliente",
+      "searchPlaceholder": "Buscar por nombre o identificación...",
+      "show": "Mostrar:",
+      "records": "registros",
+      "table": {
+        "idPassport": "CI/Pasaporte",
+        "client": "Cliente",
+        "contact": "Contacto",
+        "nationality": "Nacionalidad",
+        "actions": "Acciones",
+        "age": "Edad",
+        "years": "años"
+      },
+      "status": {
+        "notRegistered": "No registrado"
+      },
+      "actions": {
+        "viewDetails": "Ver detalles",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "empty": {
+        "noClients": "No se encontraron clientes",
+        "tryOtherSearch": "Intenta con otros términos de búsqueda",
+        "addFirstClient": "Comienza agregando tu primer cliente"
+      },
+      "pagination": {
+        "showing": "Mostrando",
+        "to": "a",
+        "of": "de",
+        "clients": "clientes"
+      },
+      "deleteModal": {
+        "title": "¿Eliminar Cliente?",
+        "message": "¿Estás seguro de que deseas eliminar a",
+        "warning": "? Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar"
+      }
     },
     "appointments": {
       "title": "Citas",
       "description": "Gestión de citas y calendario",
       "comingSoon": "Módulo de citas próximamente..."
+    },
+    "tattoos": {
+      "title": "Tatuajes",
+      "description": "Gestiona el portafolio de trabajos realizados"
     }
   },
   "settings": {

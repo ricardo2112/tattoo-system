@@ -1,5 +1,5 @@
 // Import Dependencies
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStep, useDisclosure } from "@/hooks/index";
 import clsx from "clsx";
@@ -22,9 +22,9 @@ import {
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 import { SiInstagram } from "react-icons/si";
-import { Fragment } from "react";
 import Cleave from "cleave.js/react";
 // Local Imports
+import { Page } from "@/components/shared/Page";
 import { Button, Input, Skeleton, Radio } from "@/components/ui";
 import { DatePicker } from "@/components/shared/form/Datepicker";
 import { clienteService } from "@/services/clienteService";
@@ -130,14 +130,21 @@ export default function ClienteForm() {
   const [selectedReferencias, setSelectedReferencias] = useState<string[]>([]);
   const [otraReferencia, setOtraReferencia] = useState("");
 
-  // Cargar datos iniciales
+  // Cargar países y catálogos primero
   useEffect(() => {
     loadCountries();
     loadCatalogos();
-    if (slug) {
-      loadClienteBySlug(slug);
-    }
-  }, [slug]);
+  }, []);
+
+  // Cargar cliente después de que países y catálogos estén listos
+  useEffect(() => {
+    const loadCliente = async () => {
+      if (slug && !loadingCountries && !loadingCatalogos && countries.length > 0) {
+        await loadClienteBySlug(slug);
+      }
+    };
+    loadCliente();
+  }, [slug, loadingCountries, loadingCatalogos, countries]);
 
   const loadClienteBySlug = async (clienteSlug: string) => {
     try {
@@ -147,7 +154,7 @@ export default function ClienteForm() {
 
       if (foundCliente) {
         setClienteId(foundCliente.idCliente);
-        loadCliente(foundCliente.idCliente);
+        await loadClienteData(foundCliente);
       } else {
         setModalStatus("error");
         setModalMessage("Cliente no encontrado");
@@ -197,24 +204,134 @@ export default function ClienteForm() {
     }
   };
 
-  const loadCliente = async (clienteId: number) => {
+  const loadClienteData = async (cliente: Cliente) => {
     try {
-      setLoading(true);
-      const cliente = await clienteService.getById(clienteId);
+      console.log("=== CARGANDO DATOS DEL CLIENTE ===");
+      console.log("Cliente:", cliente);
+      console.log("Países disponibles:", countries.length);
+      console.log("Catálogos - Condiciones:", condicionesMedicasCatalogo.length);
+      console.log("Catálogos - Enfermedades:", enfermedadesPielCatalogo.length);
+      console.log("Catálogos - Deportes:", deportesCatalogo.length);
+      console.log("Catálogos - Referencias:", referenciasCatalogo.length);
+
+      if (countries.length === 0) {
+        console.error("ERROR: No hay países cargados aún");
+        return;
+      }
+
       setFormData(cliente);
 
-      // Cargar pa�s si existe
-      if (cliente.nacionalidad) {
+      // Cargar país de nacionalidad si existe
+      if (cliente.nacionalidad && countries.length > 0) {
         const country = countries.find(c => c.alpha2Code === cliente.nacionalidad);
-        if (country) setSelectedCountry(country);
+        console.log("País de nacionalidad encontrado:", country);
+        if (country) {
+          setSelectedCountry(country);
+        }
+      }
+
+      // Cargar país y número de teléfono
+      if (cliente.telefono && countries.length > 0) {
+        // Extraer código de país del teléfono (formato: +598 99 123 456)
+        const phoneMatch = cliente.telefono.match(/^\+(\d+)\s+(.+)$/);
+        console.log("Teléfono original:", cliente.telefono);
+        console.log("Teléfono parseado:", phoneMatch);
+
+        if (phoneMatch) {
+          const callingCode = phoneMatch[1];
+          const number = phoneMatch[2];
+
+          // Buscar el país por código de llamada
+          const phoneCountry = countries.find(c => c.callingCodes[0] === callingCode);
+          console.log("País del teléfono encontrado:", phoneCountry);
+
+          if (phoneCountry) {
+            setSelectedPhoneCountry(phoneCountry);
+          }
+          setPhoneNumber(number);
+        } else {
+          // Si no tiene formato, solo guardar el número
+          setPhoneNumber(cliente.telefono);
+        }
+      }
+
+      // Cargar condiciones médicas
+      if (cliente.condicionMedica && cliente.condicionMedica.trim() !== "") {
+        console.log("Condiciones médicas del cliente:", cliente.condicionMedica);
+        setTieneCondicionesMedicas("si");
+
+        const condiciones = cliente.condicionMedica.split(",").map(c => c.trim());
+        const catalogoNames = condicionesMedicasCatalogo.map(c => c.nombreCatalogo);
+        const selected = condiciones.filter(c => catalogoNames.includes(c));
+        const otras = condiciones.filter(c => !catalogoNames.includes(c));
+
+        console.log("Condiciones seleccionadas:", selected);
+        console.log("Otras condiciones:", otras);
+
+        setSelectedCondiciones(selected);
+        if (otras.length > 0) setOtraCondicion(otras.join(", "));
+      } else {
+        setTieneCondicionesMedicas("no");
+      }
+
+      // Cargar enfermedades de piel
+      if (cliente.enfermedadPiel && cliente.enfermedadPiel.trim() !== "") {
+        console.log("Enfermedades de piel del cliente:", cliente.enfermedadPiel);
+        setTieneEnfermedadesPiel("si");
+
+        const enfermedades = cliente.enfermedadPiel.split(",").map(e => e.trim());
+        const catalogoNames = enfermedadesPielCatalogo.map(e => e.nombreCatalogo);
+        const selected = enfermedades.filter(e => catalogoNames.includes(e));
+        const otras = enfermedades.filter(e => !catalogoNames.includes(e));
+
+        console.log("Enfermedades seleccionadas:", selected);
+        console.log("Otras enfermedades:", otras);
+
+        setSelectedEnfermedades(selected);
+        if (otras.length > 0) setOtraEnfermedad(otras.join(", "));
+      } else {
+        setTieneEnfermedadesPiel("no");
+      }
+
+      // Cargar deportes
+      if (cliente.deporte && cliente.deporte.trim() !== "") {
+        console.log("Deportes del cliente:", cliente.deporte);
+        setPracticaDeporte("si");
+
+        const deportes = cliente.deporte.split(",").map(d => d.trim());
+        const catalogoNames = deportesCatalogo.map(d => d.nombreCatalogo);
+        const selected = deportes.filter(d => catalogoNames.includes(d));
+        const otros = deportes.filter(d => !catalogoNames.includes(d));
+
+        console.log("Deportes seleccionados:", selected);
+        console.log("Otros deportes:", otros);
+
+        setSelectedDeportes(selected);
+        if (otros.length > 0) setOtroDeporte(otros.join(", "));
+      } else {
+        setPracticaDeporte("no");
+      }
+
+      // Cargar referencias
+      if (cliente.referencia && cliente.referencia.trim() !== "") {
+        console.log("Referencias del cliente:", cliente.referencia);
+
+        const referencias = cliente.referencia.split(",").map(r => r.trim());
+        const catalogoNames = referenciasCatalogo.map(r => r.nombreCatalogo);
+        const selected = referencias.filter(r => catalogoNames.includes(r));
+        const otras = referencias.filter(r => !catalogoNames.includes(r));
+
+        console.log("Referencias seleccionadas:", selected);
+        console.log("Otras referencias:", otras);
+
+        setSelectedReferencias(selected);
+        if (otras.length > 0) setOtraReferencia(otras.join(", "));
       }
     } catch (error) {
       console.error("Error al cargar cliente:", error);
       setModalStatus("error");
       setModalMessage("Error al cargar los datos del cliente");
       open();
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -415,38 +532,41 @@ export default function ClienteForm() {
 
   if (loading || loadingCountries || loadingCatalogos) {
     return (
-      <div className="mx-auto max-w-4xl space-y-6 p-6">
-        <Skeleton className="h-12 w-full rounded-lg" />
-        <Skeleton className="h-96 w-full rounded-lg" />
-      </div>
+      <Page title="Cargando...">
+        <div className="mx-auto max-w-4xl px-6 py-8">
+          <Skeleton className="h-12 w-full rounded-lg mb-6" />
+          <Skeleton className="h-96 w-full rounded-lg" />
+        </div>
+      </Page>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="mb-4 flex items-center gap-3">
-          <Button
-            onClick={handleBack}
-            variant="outlined"
-            isIcon
-            className="size-10 rounded-full"
-            data-tooltip
-            data-tooltip-content="Volver a clientes"
-          >
-            <ArrowLeftIcon className="size-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {clienteId ? "Editar Cliente" : "Nuevo Cliente"}
-            </h1>
+    <Page title={clienteId ? "Editar Cliente" : "Nuevo Cliente"}>
+      <div className="mx-auto max-w-4xl px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="mb-4 flex items-center gap-3">
+            <Button
+              onClick={handleBack}
+              variant="outlined"
+              isIcon
+              className="size-10 rounded-full"
+              data-tooltip
+              data-tooltip-content="Volver a clientes"
+            >
+              <ArrowLeftIcon className="size-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {clienteId ? "Editar Cliente" : "Nuevo Cliente"}
+              </h1>
+            </div>
           </div>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Complete la información en los siguientes pasos
+          </p>
         </div>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Complete la información en los siguientes pasos
-        </p>
-      </div>
 
       {/* Stepper */}
       <ol className="steps mb-8">
@@ -1099,6 +1219,7 @@ export default function ClienteForm() {
           </div>
         </Dialog>
       </Transition>
-    </div>
+      </div>
+    </Page>
   );
 }

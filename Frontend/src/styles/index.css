@@ -14,9 +14,8 @@
 
 @theme {
   --font-sans:
-    "TikTok Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
+    "Golos Text", sans-serif;
+    
   --text-tiny: 0.625rem;
   --text-tiny--line-height: 0.8125rem;
 

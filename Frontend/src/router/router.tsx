@@ -12,7 +12,7 @@ const protectedRoutes: RouteObject = {
       children: [
         {
           index: true,
-          element: <Navigate to="/modules/home" />,
+          element: <Navigate to="/" />,
         },
         {
           path: "modules",
@@ -61,10 +61,41 @@ const protectedRoutes: RouteObject = {
               path: "citas",
               lazy: async () => ({
                 Component: (
-                  await import("@/app/pages/modules/citas")
+                  await import("@/app/pages/modules/citas/index")
                 ).default,
               }),
             },
+
+            {
+              path: "tatuajes",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/tatuajes/index")
+                ).default,
+              }),
+            },
+
+            {
+              path: "piercings",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/piercings/index")
+                ).default,
+              }),
+            },
+
+
+
+            {
+              path: "usuarios",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/usuarios/index")
+                ).default,
+              }),
+            },
+
+
           ],
         },
         {
@@ -87,6 +118,14 @@ const protectedRoutes: RouteObject = {
               lazy: async () => ({
                 Component: (
                   await import("@/app/pages/settings/appearance")
+                ).default,
+              }),
+            },
+            {
+              path: "catalogos",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/catalogos/index")
                 ).default,
               }),
             },

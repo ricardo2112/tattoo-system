@@ -11,14 +11,15 @@ import {
   PencilIcon,
   CalendarIcon,
   CurrencyDollarIcon,
-  UserIcon,
   EnvelopeIcon,
-  PhoneIcon,
   MapPinIcon,
   CakeIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import { SiWhatsapp, SiInstagram } from "react-icons/si";
+import { FaUser } from "react-icons/fa6";
+import { IoBody } from "react-icons/io5";
+import { PiIdentificationCard } from "react-icons/pi";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { clienteService } from "@/services/clienteService";
@@ -246,14 +247,16 @@ export default function ClienteDetail() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Informaci�n Personal - Sidebar */}
+          {/* Información Personal - Sidebar */}
           <div className="lg:col-span-1">
             <Card className="p-6">
               <div className="flex flex-col items-center border-b border-gray-150 pb-6 dark:border-dark-600">
                 <Avatar
                   size={24}
+                  initialVariant="soft"
+                initialColor="primary"
                   classNames={{
-                    display: "border-4 border-gray-100 bg-gradient-to-br from-blue-500 to-purple-600 text-3xl font-bold dark:border-dark-600",
+                    initial: "border border-this-darker/20 dark:border-this-lighter/20 text-3xl font-bold",
                   }}
                 >
                   {cliente.nombre?.[0]}{cliente.apellido?.[0]}
@@ -263,16 +266,16 @@ export default function ClienteDetail() {
                 </h2>
                 {cliente.fechaNacimiento && (
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    {calcularEdad(cliente.fechaNacimiento)} a�os
+                    {calcularEdad(cliente.fechaNacimiento)} años
                   </p>
                 )}
               </div>
 
               <div className="mt-6 space-y-4">
-                {/* Identificaci�n */}
+                {/* Identificación */}
                 {cliente.identificacion && (
                   <div className="flex items-start gap-3">
-                    <UserIcon className="size-5 mt-0.5 text-gray-400" />
+                    <PiIdentificationCard className="size-5 mt-0.5 text-gray-400" />
                     <div className="flex-1">
                       <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         CI/Pasaporte
@@ -299,19 +302,24 @@ export default function ClienteDetail() {
                   </div>
                 )}
 
-                {/* Tel�fono */}
+                {/* Teléfono */}
                 {cliente.telefono && (
                   <div className="flex items-start gap-3">
-                    <PhoneIcon className="size-5 mt-0.5 text-gray-400" />
+                    <SiWhatsapp className="size-5 mt-0.5 text-gray-400" />
                     <div className="flex-1">
                       <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                        Tel�fono
+                        Teléfono
                       </p>
-                      <div className="mt-1 flex items-center gap-2">
-                        <SiWhatsapp className="size-4 text-green-600" />
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {cliente.telefono}
-                        </p>
+                      <div className="mt-1">
+                        <a
+                          href={`https://wa.me/${cliente.telefono.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group inline-flex items-center gap-2 text-sm font-medium text-gray-900 transition-colors hover:text-green-600 dark:text-white dark:hover:text-green-500"
+                        >
+                          <span className="group-hover:underline">{cliente.telefono}</span>
+                          <SiWhatsapp className="size-4 text-green-600 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-110" />
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -320,14 +328,22 @@ export default function ClienteDetail() {
                 {/* Instagram */}
                 {cliente.redes && (
                   <div className="flex items-start gap-3">
-                    <SiInstagram className="size-5 mt-0.5 text-pink-600" />
+                    <SiInstagram className="size-5 mt-0.5 text-gray-400" />
                     <div className="flex-1">
                       <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Instagram
                       </p>
-                      <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-                        @{cliente.redes}
-                      </p>
+                      <div className="mt-1">
+                        <a
+                          href={`https://instagram.com/${cliente.redes.replace("@", "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group inline-flex items-center gap-2 text-sm font-medium text-gray-900 transition-colors hover:text-pink-600 dark:text-white dark:hover:text-pink-500"
+                        >
+                          <span className="group-hover:underline">@{cliente.redes}</span>
+                          <SiInstagram className="size-4 text-pink-600 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-110" />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -370,17 +386,17 @@ export default function ClienteDetail() {
                 )}
               </div>
 
-              {/* Informaci�n M�dica */}
+              {/* Información Médica */}
               {(cliente.condicionMedica || cliente.enfermedadPiel || cliente.deporte) && (
                 <div className="mt-6 border-t border-gray-150 pt-6 dark:border-dark-600">
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                    Informaci�n Adicional
+                    Información Adicional
                   </h3>
                   <div className="mt-4 space-y-3">
                     {cliente.condicionMedica && (
                       <div>
                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Condiciones M�dicas
+                          Condiciones Médicas
                         </p>
                         <p className="mt-1 text-sm text-gray-900 dark:text-white">
                           {cliente.condicionMedica}
@@ -437,7 +453,7 @@ export default function ClienteDetail() {
                       Pagos Pendientes
                     </h3>
                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                      Este cliente tiene pagos pendientes en uno o m�s servicios
+                      Este cliente tiene pagos pendientes en uno o más servicios
                     </p>
                     <div className="mt-3 space-y-2">
                       {tatuajes.map(tatuaje => {
@@ -485,7 +501,7 @@ export default function ClienteDetail() {
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {tatuaje.detalle || "Tatuaje sin descripci�n"}
+                                {tatuaje.detalle || "Tatuaje sin descripción"}
                               </h3>
                               <Badge
                                 variant="soft"
@@ -498,17 +514,17 @@ export default function ClienteDetail() {
                             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
                               {tatuaje.artista && (
                                 <span className="flex items-center gap-1">
-                                  <UserIcon className="size-4" />
+                                  <FaUser className="size-4" />
                                   {tatuaje.artista}
                                 </span>
                               )}
                               {tatuaje.zonaTatuaje && (
                                 <span className="flex items-center gap-1">
-                                  <MapPinIcon className="size-4" />
+                                  <IoBody className="size-4" />
                                   {tatuaje.zonaTatuaje}
                                 </span>
                               )}
-                              <span className="text-xs text-gray-500">
+                              <span className="flex items-center text-xs gap-2">
                                 Creado: {formatDate(tatuaje.fechaCreacion)}
                               </span>
                             </div>
@@ -548,7 +564,7 @@ export default function ClienteDetail() {
                           <div className="mt-4">
                             <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                               <CurrencyDollarIcon className="size-5" />
-                              Historial de Pagos ({tatuaje.pagos.length})
+                              Historial de Pagos
                             </h4>
                             <div className="mt-3 space-y-2">
                               {tatuaje.pagos.map((pago) => (
@@ -565,7 +581,7 @@ export default function ClienteDetail() {
                                         {formatCurrency(pago.monto)}
                                       </p>
                                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {pago.formaPago || "No especificado"} " {formatDate(pago.fechaPago)}
+                                        {pago.formaPago || "No especificado"}: {formatDate(pago.fechaPago)}
                                       </p>
                                     </div>
                                   </div>
@@ -580,7 +596,7 @@ export default function ClienteDetail() {
                           <div className="mt-4">
                             <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                               <CalendarIcon className="size-5" />
-                              Citas Asociadas ({tatuaje.citas.length})
+                              Historial de Citas
                             </h4>
                             <div className="mt-3 space-y-2">
                               {tatuaje.citas.map((cita) => (
@@ -594,11 +610,11 @@ export default function ClienteDetail() {
                                     </div>
                                     <div>
                                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                        {cita.titulo || "Cita sin t�tulo"}
+                                        {cita.titulo || "Cita sin título"}
                                       </p>
                                       <p className="text-xs text-gray-500 dark:text-gray-400">
                                         {formatDateTime(cita.fechaInicio)}
-                                        {cita.duracionMinutos && ` " ${cita.duracionMinutos} min`}
+                                        {cita.duracionMinutos && ` (${cita.duracionMinutos} min)`}
                                       </p>
                                     </div>
                                   </div>

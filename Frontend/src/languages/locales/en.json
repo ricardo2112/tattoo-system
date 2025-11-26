@@ -51,6 +51,7 @@
       "inventory": "Inventory",
       "finances": "Finances",
       "users": "Users",
+      "catalog": "Data Dictionary",
       "settings": "Settings"
     }
   },
@@ -77,13 +78,56 @@
     },
     "clients": {
       "title": "Clients",
-      "description": "Client management and information",
-      "comingSoon": "Clients module coming soon..."
+      "description": "Manage your clients information",
+      "comingSoon": "Clients module coming soon...",
+      "newClient": "New Client",
+      "searchPlaceholder": "Search by name or identification...",
+      "show": "Show:",
+      "records": "records",
+      "table": {
+        "idPassport": "ID/Passport",
+        "client": "Client",
+        "contact": "Contact",
+        "nationality": "Nationality",
+        "actions": "Actions",
+        "age": "Age",
+        "years": "years"
+      },
+      "status": {
+        "notRegistered": "Not registered"
+      },
+      "actions": {
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "noClients": "No clients found",
+        "tryOtherSearch": "Try different search terms",
+        "addFirstClient": "Start by adding your first client"
+      },
+      "pagination": {
+        "showing": "Showing",
+        "to": "to",
+        "of": "of",
+        "clients": "clients"
+      },
+      "deleteModal": {
+        "title": "Delete Client?",
+        "message": "Are you sure you want to delete",
+        "warning": "? This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
     },
     "appointments": {
       "title": "Appointments",
       "description": "Appointment and calendar management",
       "comingSoon": "Appointments module coming soon..."
+    },
+    "tattoos": {
+      "title": "Tattoos",
+      "description": "Manage your portfolio of completed works"
     }
   },
   "settings": {

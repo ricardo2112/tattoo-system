@@ -4,11 +4,12 @@ import {
   UsersIcon,
   CalendarIcon,
   Cog6ToothIcon,
-  SparklesIcon,
   CubeIcon,
   CurrencyDollarIcon,
 } from "@heroicons/react/24/solid";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { BookOpenIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { FaEraser } from "react-icons/fa";
+import { GiSkullRing, GiSkullWithSyringe, GiTripleSkulls } from "react-icons/gi";
 import clsx from "clsx";
 import {
   Accordion,
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui";
 import appLogo from "@/assets/appLogo.png";
 import { useTranslation } from "react-i18next";
+
+
 
 interface NavItem {
   nameKey: string;
@@ -37,13 +40,14 @@ export default function Sidebar() {
   const navigation: NavItem[] = [
     { nameKey: "navigation.items.home", path: "/modules/home", icon: HomeIcon, category: "main" },
     { nameKey: "navigation.items.appointments", path: "/modules/citas", icon: CalendarIcon, category: "main" },
-    { nameKey: "navigation.items.clients", path: "/modules/clientes", icon: UsersIcon, category: "main" },
-    { nameKey: "navigation.items.tattoos", path: "/modules/tatuajes", icon: SparklesIcon, category: "main" },
-    { nameKey: "navigation.items.piercings", path: "/modules/piercings", icon: SparklesIcon, category: "main" },
-    { nameKey: "navigation.items.laserRemoval", path: "/modules/laser", icon: SparklesIcon, category: "main" },
+    { nameKey: "navigation.items.clients", path: "/modules/clientes", icon: GiTripleSkulls , category: "main" },
+    { nameKey: "navigation.items.tattoos", path: "/modules/tatuajes", icon: GiSkullWithSyringe, category: "main" },
+    { nameKey: "navigation.items.piercings", path: "/modules/piercings", icon: GiSkullRing, category: "main" },
+    { nameKey: "navigation.items.laserRemoval", path: "/modules/laser", icon: FaEraser, category: "main" },
     { nameKey: "navigation.items.inventory", path: "/modules/inventario", icon: CubeIcon, category: "management" },
     { nameKey: "navigation.items.finances", path: "/modules/finanzas", icon: CurrencyDollarIcon, category: "management" },
     { nameKey: "navigation.items.users", path: "/modules/usuarios", icon: UsersIcon, category: "management" },
+    { nameKey: "navigation.items.catalog", path: "/settings/catalogos", icon: BookOpenIcon, category: "settings" },
     { nameKey: "navigation.items.settings", path: "/settings/general", icon: Cog6ToothIcon, category: "settings" },
   ];
 

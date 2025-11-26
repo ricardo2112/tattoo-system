@@ -42,6 +42,7 @@ import { countryService } from "@/services/countryService";
 import { calcularEdad } from "@/utils/edad";
 import type { Cliente } from "@/types/cliente";
 import type { Country } from "@/types/country";
+import { GiTripleSkulls } from "react-icons/gi";
 
 type SortField = "identificacion" | "nombre" | "apellido" | "telefono" | "nacionalidad";
 type SortOrder = "asc" | "desc";
@@ -75,6 +76,10 @@ export default function Clientes() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+
+  // Modal states
+  const [modalStatus, setModalStatus] = useState<"warning" | "error">("warning");
+  const [modalMessage, setModalMessage] = useState("");
 
   // Table states
   const [searchTerm, setSearchTerm] = useState("");
@@ -181,13 +186,36 @@ export default function Clientes() {
   };
 
   // Handle delete
-  const handleDeleteClick = (cliente: Cliente) => {
+  const handleDeleteClick = async (cliente: Cliente) => {
     setSelectedCliente(cliente);
-    openDeleteModal();
+
+    // Verificar si el cliente tiene tatuajes
+    try {
+      const { tatuajeService } = await import("@/services/tatuajeService");
+      const clienteTatuajes = await tatuajeService.getByClienteId(cliente.idCliente);
+
+      if (clienteTatuajes.length > 0) {
+        // Cliente tiene tatuajes, mostrar mensaje de error
+        setModalMessage(`No se puede eliminar el cliente ${cliente.nombre} ${cliente.apellido} porque tiene ${clienteTatuajes.length} servicio(s) de tatuaje asociado(s). Por favor, elimine primero los servicios antes de eliminar el cliente.`);
+        setModalStatus("error");
+        openDeleteModal();
+        return;
+      }
+
+      // No tiene tatuajes, mostrar confirmación
+      setModalMessage("");
+      setModalStatus("warning");
+      openDeleteModal();
+    } catch (error) {
+      console.error("Error al verificar tatuajes:", error);
+      setModalMessage("Error al verificar los servicios del cliente");
+      setModalStatus("error");
+      openDeleteModal();
+    }
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedCliente) return;
+    if (!selectedCliente || modalStatus === "error") return;
 
     try {
       await clienteService.delete(selectedCliente.idCliente);
@@ -196,6 +224,8 @@ export default function Clientes() {
       setSelectedCliente(null);
     } catch (error) {
       console.error("Error deleting cliente:", error);
+      setModalMessage("Error al eliminar el cliente");
+      setModalStatus("error");
     }
   };
 
@@ -241,20 +271,20 @@ export default function Clientes() {
                   "border bg-transparent text-base dark:border-dark-400 dark:bg-transparent",
               }}
               >
-              <UsersIcon className="size-9" />
+              <GiTripleSkulls  className="size-9" />
             </Avatar>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 {t("modules.clients.title")}
               </h1>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Gestiona la información de tus clientes
+                {t("modules.clients.description")}
               </p>
             </div>
           </div>
           <Button className = "py-3" onClick={handleNew} color="primary">
             <PlusIcon className="size-5 mr-2" />
-            Nuevo Cliente
+            {t("modules.clients.newClient")}
           </Button>
         </div>
 
@@ -264,7 +294,7 @@ export default function Clientes() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1 max-w-md">
                 <Input
-                  placeholder="Buscar por nombre o identificación..."
+                  placeholder={t("modules.clients.searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   prefix={<MagnifyingGlassIcon className="size-4.5 text-gray-400" />}
@@ -273,17 +303,17 @@ export default function Clientes() {
               </div>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600 dark:text-gray-400">
-                  Mostrar:
+                  {t("modules.clients.show")}
                 </label>
                 <select
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
                   className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-300 dark:hover:border-dark-500"
                 >
-                  <option value={10}>10 registros</option>
-                  <option value={25}>25 registros</option>
-                  <option value={50}>50 registros</option>
-                  <option value={100}>100 registros</option>
+                  <option value={10}>10 {t("modules.clients.records")}</option>
+                  <option value={25}>25 {t("modules.clients.records")}</option>
+                  <option value={50}>50 {t("modules.clients.records")}</option>
+                  <option value={100}>100 {t("modules.clients.records")}</option>
                 </select>
               </div>
             </div>
@@ -307,32 +337,32 @@ export default function Clientes() {
                       className="cursor-pointer px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"
                       onClick={() => handleSort("identificacion")}
                     >
-                      CI/Pasaporte
+                      {t("modules.clients.table.idPassport")}
                       <SortIcon field="identificacion" />
                     </th>
                     <th
                       className="cursor-pointer px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"
                       onClick={() => handleSort("nombre")}
                     >
-                      Cliente
+                      {t("modules.clients.table.client")}
                       <SortIcon field="nombre" />
                     </th>
                     <th
                       className="cursor-pointer px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"
                       onClick={() => handleSort("telefono")}
                     >
-                      Contacto
+                      {t("modules.clients.table.contact")}
                       <SortIcon field="telefono" />
                     </th>
                     <th
                       className="cursor-pointer px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-dark-700"
                       onClick={() => handleSort("nacionalidad")}
                     >
-                      Nacionalidad
+                      {t("modules.clients.table.nationality")}
                       <SortIcon field="nacionalidad" />
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                      Acciones
+                      {t("modules.clients.table.actions")}
                     </th>
                   </tr>
                 </thead>
@@ -343,12 +373,12 @@ export default function Clientes() {
                         <div className="flex flex-col items-center justify-center">
                           <UsersIcon className="mb-3 size-12 text-gray-300 dark:text-gray-600" />
                           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            No se encontraron clientes
+                            {t("modules.clients.empty.noClients")}
                           </p>
                           <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                             {searchTerm
-                              ? "Intenta con otros términos de búsqueda"
-                              : "Comienza agregando tu primer cliente"}
+                              ? t("modules.clients.empty.tryOtherSearch")
+                              : t("modules.clients.empty.addFirstClient")}
                           </p>
                         </div>
                       </td>
@@ -369,7 +399,7 @@ export default function Clientes() {
                                     color="error"
                                     className="border border-this-darker/20 dark:border-this-lighter/20"
                                     >
-                                    No registrado
+                                    {t("modules.clients.status.notRegistered")}
                                 </Badge>
                               }
                             </div>
@@ -381,7 +411,7 @@ export default function Clientes() {
                               </span>
                               {cliente.fechaNacimiento && (
                                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                                  Edad: {calcularEdad(cliente.fechaNacimiento)} años
+                                  {t("modules.clients.table.age")}: {calcularEdad(cliente.fechaNacimiento)} {t("modules.clients.table.years")}
                                 </span>
                               )}
                             </div>
@@ -389,20 +419,30 @@ export default function Clientes() {
                           <td className="px-6 py-4">
                             <div className="flex flex-col gap-1">
                               {cliente.telefono && (
-                                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                  <span className="text-xl text-gray-500 dark:text-gray-400">
-                                    <SiWhatsapp className="size-4 text-green-600" />
-                                  </span>
-                                  {cliente.telefono}
-                                </div>
+                                <a
+                                  href={`https://wa.me/${cliente.telefono.replace(/\D/g, "")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="group flex items-center gap-2 text-sm text-gray-700 transition-colors hover:text-green-600 dark:text-gray-300 dark:hover:text-green-500"
+                                  data-tooltip
+                                  data-tooltip-content="Abrir en WhatsApp"
+                                >
+                                  <SiWhatsapp className="size-4 text-green-600 transition-transform group-hover:scale-110" />
+                                  <span className="group-hover:underline">{cliente.telefono}</span>
+                                </a>
                               )}
                               {cliente.redes && (
-                                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                  <span className="text-xl text-gray-500 dark:text-gray-400">
-                                    <SiInstagram className="size-4 text-pink-600" />
-                                  </span>
-                                  @{cliente.redes}
-                                </div>
+                                <a
+                                  href={`https://instagram.com/${cliente.redes.replace("@", "")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="group flex items-center gap-2 text-sm text-gray-700 transition-colors hover:text-pink-600 dark:text-gray-300 dark:hover:text-pink-500"
+                                  data-tooltip
+                                  data-tooltip-content="Abrir en Instagram"
+                                >
+                                  <SiInstagram className="size-4 text-pink-600 transition-transform group-hover:scale-110" />
+                                  <span className="group-hover:underline">@{cliente.redes}</span>
+                                </a>
                               )}
                               {!cliente.telefono && !cliente.redes && (
                                 <span className="text-sm text-gray-400">
@@ -411,7 +451,7 @@ export default function Clientes() {
                                     color="error"
                                     className="border border-this-darker/20 dark:border-this-lighter/20"
                                     >
-                                    No registrado
+                                    {t("modules.clients.status.notRegistered")}
                                   </Badge>
                                 </span>
                               )}
@@ -442,7 +482,7 @@ export default function Clientes() {
                                   color="error"
                                   className="border border-this-darker/20 dark:border-this-lighter/20"
                                   >
-                                No registrado
+                                {t("modules.clients.status.notRegistered")}
                               </Badge>
                               </span>
                             )}
@@ -456,7 +496,7 @@ export default function Clientes() {
                                 isIcon
                                 className="size-9 rounded-full"
                                 data-tooltip
-                                data-tooltip-content="Ver detalles"
+                                data-tooltip-content={t("modules.clients.actions.viewDetails")}
                                 data-tooltip-variant="info"
                               >
                                 <EyeIcon className="size-5" />
@@ -468,7 +508,7 @@ export default function Clientes() {
                                 isIcon
                                 className="size-9 rounded-full"
                                 data-tooltip
-                                data-tooltip-content="Editar"
+                                data-tooltip-content={t("modules.clients.actions.edit")}
                               >
                                 <PencilIcon className="size-5" />
                               </Button>
@@ -479,7 +519,7 @@ export default function Clientes() {
                                 isIcon
                                 className="size-9 rounded-full"
                                 data-tooltip
-                                data-tooltip-content="Eliminar"
+                                data-tooltip-content={t("modules.clients.actions.delete")}
                                 data-tooltip-variant="error"
                               >
                                 <TrashIcon className="size-5" />
@@ -500,19 +540,19 @@ export default function Clientes() {
             <div className="border-t border-gray-150 bg-gray-50 px-6 py-4 dark:border-dark-600 dark:bg-dark-800">
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Mostrando{" "}
+                  {t("modules.clients.pagination.showing")}{" "}
                   <span className="font-medium text-gray-900 dark:text-white">
                     {(currentPage - 1) * itemsPerPage + 1}
                   </span>{" "}
-                  a{" "}
+                  {t("modules.clients.pagination.to")}{" "}
                   <span className="font-medium text-gray-900 dark:text-white">
                     {Math.min(currentPage * itemsPerPage, filteredAndSortedClientes.length)}
                   </span>{" "}
-                  de{" "}
+                  {t("modules.clients.pagination.of")}{" "}
                   <span className="font-medium text-gray-900 dark:text-white">
                     {filteredAndSortedClientes.length}
                   </span>{" "}
-                  clientes
+                  {t("modules.clients.pagination.clients")}
                 </div>
                 <Pagination
                   total={totalPages}
@@ -536,7 +576,7 @@ export default function Clientes() {
         <Dialog
           as="div"
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
-          onClose={closeDeleteModal}
+          onClose={modalStatus === "error" ? closeDeleteModal : () => {}}
         >
           <TransitionChild
             as={Fragment}
@@ -560,39 +600,61 @@ export default function Clientes() {
             leaveTo="opacity-0 scale-95"
           >
             <DialogPanel className="scrollbar-sm relative flex max-w-md flex-col overflow-y-auto rounded-lg bg-white px-4 py-10 text-center transition-all duration-300 dark:bg-dark-700 sm:px-5">
-              <ExclamationTriangleIcon className="mx-auto inline size-20 shrink-0 text-error" />
+              <ExclamationTriangleIcon
+                className={`mx-auto inline size-20 shrink-0 ${
+                  modalStatus === "error" ? "text-error" : "text-warning"
+                }`}
+              />
 
               <div className="mt-4">
                 <DialogTitle
                   as="h3"
                   className="text-2xl font-semibold text-gray-800 dark:text-dark-100"
                 >
-                  ¿Eliminar Cliente?
+                  {modalStatus === "error"
+                    ? "No se puede eliminar"
+                    : t("modules.clients.deleteModal.title")}
                 </DialogTitle>
 
                 <p className="mt-3 text-gray-600 dark:text-gray-400">
-                  ¿Estás seguro de que deseas eliminar a{" "}
-                  <span className="font-semibold text-gray-800 dark:text-white">
-                    {selectedCliente?.nombre} {selectedCliente?.apellido}
-                  </span>
-                  ? Esta acción no se puede deshacer.
+                  {modalMessage || (
+                    <>
+                      {t("modules.clients.deleteModal.message")}{" "}
+                      <span className="font-semibold text-gray-800 dark:text-white">
+                        {selectedCliente?.nombre} {selectedCliente?.apellido}
+                      </span>
+                      {t("modules.clients.deleteModal.warning")}
+                    </>
+                  )}
                 </p>
 
                 <div className="mt-6 flex gap-3">
-                  <Button
-                    onClick={closeDeleteModal}
-                    variant="outlined"
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={handleDeleteConfirm}
-                    color="error"
-                    className="flex-1"
-                  >
-                    Eliminar
-                  </Button>
+                  {modalStatus === "error" ? (
+                    <Button
+                      onClick={closeDeleteModal}
+                      color="primary"
+                      className="flex-1"
+                    >
+                      Entendido
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={closeDeleteModal}
+                        variant="outlined"
+                        className="flex-1"
+                      >
+                        {t("modules.clients.deleteModal.cancel")}
+                      </Button>
+                      <Button
+                        onClick={handleDeleteConfirm}
+                        color="error"
+                        className="flex-1"
+                      >
+                        {t("modules.clients.deleteModal.confirm")}
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </DialogPanel>

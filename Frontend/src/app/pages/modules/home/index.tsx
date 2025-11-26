@@ -2,14 +2,13 @@ import { Card } from "@/components/ui";
 import { Page } from "@/components/shared/Page";
 import { useAuthContext } from "@/app/contexts/auth/context";
 import {
-  UserGroupIcon,
-  CalendarIcon,
-  SparklesIcon,
-  ChartBarIcon,
+
   ArrowRightIcon,
-} from "@heroicons/react/24/outline";
+} from "@heroicons/react/24/solid";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
+import { GiSkullRing, GiSkullWithSyringe, GiTripleSkulls } from "react-icons/gi";
+import { LiaSkullSolid } from "react-icons/lia";
 
 interface QuickAction {
   titleKey: string;
@@ -32,25 +31,25 @@ export default function Home() {
     {
       titleKey: "modules.home.quickActions.clients.title",
       descriptionKey: "modules.home.quickActions.clients.description",
-      icon: UserGroupIcon,
-      path: "/clientes",
-      color: "bg-blue-500",
+      icon: GiTripleSkulls,
+      path: "modules/clientes",
+      color: "bg-primary",
       buttonKey: "modules.home.quickActions.clients.button",
     },
     {
       titleKey: "modules.home.quickActions.newSession.title",
       descriptionKey: "modules.home.quickActions.newSession.description",
-      icon: CalendarIcon,
-      path: "/citas",
-      color: "bg-green-500",
+      icon: GiSkullWithSyringe,
+      path: "modules/tatuajes",
+      color: "bg-secundary",
       buttonKey: "modules.home.quickActions.newSession.button",
     },
     {
       titleKey: "modules.home.quickActions.statistics.title",
       descriptionKey: "modules.home.quickActions.statistics.description",
-      icon: ChartBarIcon,
-      path: "/estadisticas",
-      color: "bg-purple-500",
+      icon: GiSkullRing,
+      path: "modules/piercings",
+      color: "bg-neutral",
       buttonKey: "modules.home.quickActions.statistics.button",
     },
   ];
@@ -58,17 +57,17 @@ export default function Home() {
   return (
     <Page title={t("navigation.items.home")}>
       {/* Welcome section - Full width, pegado al header */}
-      <div className="border-b border-gray-200 bg-primary-600 py-10 px-6 text-white dark:border-dark-700 dark:bg-primary-700">
+      <div className="border-b border-gray-200 bg-primary-900 py-10 px-6 text-white dark:border-dark-700 dark:bg-primary-800">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>
             <h1 className="mb-3 text-4xl font-bold tracking-tight">
               {t("common.welcome")}, {user?.nombre?.split(" ")[0]}
             </h1>
-            <p className="text-lg text-primary-100">
+            <p className="text-lg font-medium text-primary-100">
               {t("app.tagline")}
             </p>
           </div>
-          <SparklesIcon className="h-24 w-24 text-white/10" />
+          <LiaSkullSolid className="h-24 w-24 text-white/30" />
         </div>
       </div>
 
@@ -89,7 +88,7 @@ export default function Home() {
                     className={`rounded-xl ${action.color} bg-opacity-10 p-4`}
                   >
                     <action.icon
-                      className={`h-8 w-8 ${action.color.replace("bg-", "text-")}`}
+                      className={`h-12 w-12 ${action.color.replace("bg-", "text-")}`}
                     />
                   </div>
                 </div>
