@@ -265,10 +265,12 @@ export default function Clientes() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Avatar
-              size={15}
+              size={16}
+              initialVariant="soft"
+              initialColor="info"
               classNames={{
                 display:
-                  "border bg-transparent text-base dark:border-dark-400 dark:bg-transparent",
+                  "border border-this-darker/20 dark:border-this-lighter/20",
               }}
               >
               <GiTripleSkulls  className="size-9" />

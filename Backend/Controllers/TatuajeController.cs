@@ -1,3 +1,4 @@
+using Backend.DTOs;
 using Backend.Models;
 using Backend.Services.TatuajeService;
 using Microsoft.AspNetCore.Mvc;
@@ -72,24 +73,6 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener los tatuajes del cliente", error = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult<Tatuaje> CrearTatuaje([FromBody] Tatuaje tatuaje)
-        {
-            try
-            {
-                var nuevoTatuaje = _tatuajeService.CrearTatuaje(tatuaje);
-                return CreatedAtAction(nameof(GetTatuajeById), new { id = nuevoTatuaje.IdTatuaje }, nuevoTatuaje);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al crear el tatuaje", error = ex.Message });
             }
         }
 
@@ -290,6 +273,65 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener las citas del tatuaje", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Endpoint principal para registrar un tatuaje completo con cliente, tutor (si es menor), cita y formulario
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<RegistroTatuajeResponseDto>> RegistrarTatuajeCompleto([FromBody] RegistroTatuajeDto dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest(new { message = "Los datos del registro son requeridos" });
+            }
+
+            if (dto.Cliente == null)
+            {
+                return BadRequest(new { message = "La información del cliente es requerida" });
+            }
+
+            if (dto.Tatuaje == null)
+            {
+                return BadRequest(new { message = "La información del tatuaje es requerida" });
+            }
+
+            if (dto.Cita == null)
+            {
+                return BadRequest(new { message = "La información de la cita es requerida" });
+            }
+
+            if (dto.RegistradoPor <= 0)
+            {
+                return BadRequest(new { message = "El usuario que registra es requerido" });
+            }
+
+            try
+            {
+                var resultado = await _tatuajeService.RegistrarTatuajeCompletoAsync(dto);
+                return CreatedAtAction(
+                    nameof(GetTatuajeById),
+                    new { id = resultado.Tatuaje.IdTatuaje },
+                    resultado
+                );
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error al registrar el tatuaje completo",
+                    error = ex.Message,
+                    innerError = ex.InnerException?.Message
+                });
             }
         }
     }

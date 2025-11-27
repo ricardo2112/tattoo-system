@@ -6,6 +6,10 @@ namespace Backend.Models
     [Table("CitaServicio")]
     public class CitaServicio
     {
+        // Constante para la zona horaria del estudio
+        public const string ZONA_HORARIA_ESTUDIO = "America/Bogota";
+        public const string NOMBRE_ESTUDIO = "Tattoo Z Studio";
+
         [Key]
         [Column("id_cita")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,14 +23,18 @@ namespace Backend.Models
         [StringLength(200)]
         public string? Descripcion { get; set; }
 
+        // Fecha de la cita (solo la fecha del día)
         [Column("fecha_inicio")]
         [Required]
         public DateTime FechaInicio { get; set; }
 
+        // Hora de inicio de la cita (usa la fecha solo para extraer la hora)
         [Column("fecha_fin")]
         [Required]
         public DateTime FechaFin { get; set; }
 
+        // Duración de la cita en minutos (calculada automáticamente entre fecha_inicio y fecha_fin)
+        // Este campo es redundante pero se mantiene por compatibilidad con la base de datos
         [Column("duracion_minutos")]
         public int? DuracionMinutos { get; set; }
 

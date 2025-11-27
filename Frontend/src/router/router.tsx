@@ -74,6 +74,23 @@ const protectedRoutes: RouteObject = {
                 ).default,
               }),
             },
+            {
+              path: "tatuajes/:id",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/tatuajes/detail")
+                ).default,
+              }),
+            },
+
+            {
+              path: "tatuajes/nuevo",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/tatuajes/form")
+                ).default,
+              }),
+            },            
 
             {
               path: "piercings",

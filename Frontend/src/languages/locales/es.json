@@ -64,15 +64,15 @@
           "description": "Gestionar los clientes del sistema",
           "button": "Acceder"
         },
-        "newSession": {
+        "tattoo": {
           "title": "Tatuajes",
           "description": "Gestiona las sesiones de tatuaje",
-          "button": "Iniciar"
+          "button": "Acceder"
         },
-        "statistics": {
+        "piercing": {
           "title": "Piercings",
-          "description": "Gestiona las sesiones de tatuaje",
-          "button": "Visualizar"
+          "description": "Gestiona las sesiones de piercing",
+          "button": "Acceder"
         }
       }
     },

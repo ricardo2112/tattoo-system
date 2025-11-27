@@ -22,6 +22,8 @@ namespace Backend.Context
         public virtual DbSet<PagoTatuaje> PagoTatuajes { get; set; }
         public virtual DbSet<CitaServicio> CitaServicios { get; set; }
         public virtual DbSet<CitaTatuaje> CitaTatuajes { get; set; }
+        public virtual DbSet<Formulario> Formularios { get; set; }
+        public virtual DbSet<EventoFormulario> EventoFormularios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -195,6 +197,30 @@ namespace Backend.Context
                     .WithMany(c => c.CitaTatuajes)
                     .HasForeignKey(e => e.IdCita)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Formulario>(entity =>
+            {
+                entity.HasKey(e => e.IdFormulario);
+
+                entity.Property(e => e.FechaCreacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.FechaActualizacion)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.Activo)
+                    .HasDefaultValue(true);
+            });
+
+            modelBuilder.Entity<EventoFormulario>(entity =>
+            {
+                entity.HasKey(e => e.IdEvento);
+
+                entity.HasOne(e => e.Formulario)
+                    .WithMany(f => f.EventoFormularios)
+                    .HasForeignKey(e => e.IdFormulario)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

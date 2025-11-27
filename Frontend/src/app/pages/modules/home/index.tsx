@@ -1,10 +1,7 @@
-import { Card } from "@/components/ui";
+import { Avatar, Card } from "@/components/ui";
 import { Page } from "@/components/shared/Page";
 import { useAuthContext } from "@/app/contexts/auth/context";
-import {
-
-  ArrowRightIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { GiSkullRing, GiSkullWithSyringe, GiTripleSkulls } from "react-icons/gi";
@@ -32,32 +29,32 @@ export default function Home() {
       titleKey: "modules.home.quickActions.clients.title",
       descriptionKey: "modules.home.quickActions.clients.description",
       icon: GiTripleSkulls,
-      path: "modules/clientes",
+      path: "../../modules/clientes",
       color: "bg-primary",
       buttonKey: "modules.home.quickActions.clients.button",
     },
     {
-      titleKey: "modules.home.quickActions.newSession.title",
-      descriptionKey: "modules.home.quickActions.newSession.description",
+      titleKey: "modules.home.quickActions.tattoo.title",
+      descriptionKey: "modules.home.quickActions.tattoo.description",
       icon: GiSkullWithSyringe,
-      path: "modules/tatuajes",
+      path: "../../modules/tatuajes",
       color: "bg-secundary",
-      buttonKey: "modules.home.quickActions.newSession.button",
+      buttonKey: "modules.home.quickActions.tattoo.button",
     },
     {
-      titleKey: "modules.home.quickActions.statistics.title",
-      descriptionKey: "modules.home.quickActions.statistics.description",
+      titleKey: "modules.home.quickActions.piercing.title",
+      descriptionKey: "modules.home.quickActions.piercing.description",
       icon: GiSkullRing,
-      path: "modules/piercings",
+      path: "../../modules/piercings",
       color: "bg-neutral",
-      buttonKey: "modules.home.quickActions.statistics.button",
+      buttonKey: "modules.home.quickActions.piercing.button",
     },
   ];
 
   return (
     <Page title={t("navigation.items.home")}>
       {/* Welcome section - Full width, pegado al header */}
-      <div className="border-b border-gray-200 bg-primary-900 py-10 px-6 text-white dark:border-dark-700 dark:bg-primary-800">
+      <div className="border-b border-gray-200 bg-[#D9A441] py-10 px-6 text-white dark:bg-[#734B02] dark:border-dark-700">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>
             <h1 className="mb-3 text-4xl font-bold tracking-tight">
@@ -84,13 +81,19 @@ export default function Home() {
             >
               <div className="p-6">
                 <div className="mb-4 flex items-start justify-between">
-                  <div
-                    className={`rounded-xl ${action.color} bg-opacity-10 p-4`}
+                  <Avatar
+                    size={19}
+                    initialVariant="soft"
+                    initialColor="info"
+                    classNames={{
+                      display:
+                        "border border-this-darker/20 dark:border-this-lighter/20",
+                    }}
                   >
                     <action.icon
                       className={`h-12 w-12 ${action.color.replace("bg-", "text-")}`}
                     />
-                  </div>
+                  </Avatar>
                 </div>
 
                 <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">

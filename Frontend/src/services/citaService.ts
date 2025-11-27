@@ -33,8 +33,4 @@ export const citaService = {
     const response = await axiosInstance.put<Cita>(`${ENDPOINT}/${id}`, cita);
     return response.data;
   },
-
-  async delete(id: number): Promise<void> {
-    await axiosInstance.delete(`${ENDPOINT}/${id}`);
-  },
 };

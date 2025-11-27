@@ -2,6 +2,7 @@ import axiosInstance from "@/utils/axios";
 import type { Tatuaje } from "@/types/tatuaje";
 import type { Pago } from "@/types/pago";
 import type { Cita } from "@/types/cita";
+import type { RegistroTatuajeDto, RegistroTatuajeResponse } from "@/types/registroTatuaje";
 
 const ENDPOINT = "/api/Tatuaje";
 
@@ -43,5 +44,11 @@ export const tatuajeService = {
 
   async delete(id: number): Promise<void> {
     await axiosInstance.delete(`${ENDPOINT}/${id}`);
+  },
+
+  // Nuevo endpoint para registro completo de tatuaje
+  async registrarCompleto(data: RegistroTatuajeDto): Promise<RegistroTatuajeResponse> {
+    const response = await axiosInstance.post<RegistroTatuajeResponse>(`${ENDPOINT}/registrar-completo`, data);
+    return response.data;
   },
 };

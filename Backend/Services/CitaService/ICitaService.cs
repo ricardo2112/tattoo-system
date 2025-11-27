@@ -6,9 +6,8 @@ namespace Backend.Services.CitaService
     {
         List<CitaServicio> GetAllCitas();
         CitaServicio GetCitaById(int id);
-        CitaServicio CrearCita(CitaServicio cita);
-        CitaServicio ActualizarCita(int id, CitaServicio cita);
-        bool EliminarCita(int id);
+        Task<CitaServicio> CrearCitaAsync(CitaServicio cita, string? clienteEmail = null, string? clienteNombre = null);
+        Task<CitaServicio> ActualizarCitaAsync(int id, CitaServicio cita, string? clienteEmail = null, string? clienteNombre = null);
         List<CitaServicio> GetCitasByEstado(string estado);
         List<CitaServicio> GetCitasByFecha(DateTime fecha);
         List<Tatuaje> GetTatuajesByCitaId(int idCita);

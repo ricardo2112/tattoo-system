@@ -207,6 +207,12 @@ $RECYCLE.BIN/
 *.crt
 *.cer
 
+# Google Calendar credentials
+credentials.json
+token.json
+TokenResponse/
+service-account-key.json
+
 # Database files
 *.sqlite
 *.sqlite3

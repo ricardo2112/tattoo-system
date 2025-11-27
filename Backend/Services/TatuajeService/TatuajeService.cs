@@ -1,5 +1,10 @@
 using Backend.Context;
+using Backend.DTOs;
 using Backend.Models;
+using Backend.Services.ClienteService;
+using Backend.Services.CitaService;
+using Backend.Services.FormularioService;
+using Backend.Services.TutorService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.TatuajeService
@@ -7,10 +12,24 @@ namespace Backend.Services.TatuajeService
     public class TatuajeService : ITatuajeService
     {
         private readonly TattooDbContext _context;
+        private readonly IClienteService _clienteService;
+        private readonly ICitaService _citaService;
+        private readonly ITutorService _tutorService;
+        private readonly IFormularioService _formularioService;
+        private const int EDAD_MAYORIA = 18;
 
-        public TatuajeService(TattooDbContext context)
+        public TatuajeService(
+            TattooDbContext context,
+            IClienteService clienteService,
+            ICitaService citaService,
+            ITutorService tutorService,
+            IFormularioService formularioService)
         {
             _context = context;
+            _clienteService = clienteService;
+            _citaService = citaService;
+            _tutorService = tutorService;
+            _formularioService = formularioService;
         }
 
         public List<Tatuaje> GetAllTatuajes()
@@ -455,6 +474,169 @@ namespace Backend.Services.TatuajeService
                 // Si falla la actualización del estado, no lanzamos excepción
                 // para no interrumpir la operación principal
             }
+        }
+
+        /// <summary>
+        /// Método principal para registrar un tatuaje completo con cliente, tutor (si es menor), cita y formulario
+        /// </summary>
+        public async Task<RegistroTatuajeResponseDto> RegistrarTatuajeCompletoAsync(RegistroTatuajeDto dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 1. GESTIÓN DEL CLIENTE (existente o nuevo)
+                Cliente cliente;
+                if (dto.Cliente.IdCliente.HasValue)
+                {
+                    // Cliente existente
+                    cliente = _clienteService.GetClienteById(dto.Cliente.IdCliente.Value);
+                }
+                else
+                {
+                    // Crear nuevo cliente
+                    var nuevoCliente = new Cliente
+                    {
+                        Identificacion = dto.Cliente.Identificacion,
+                        Nombre = dto.Cliente.Nombre,
+                        Apellido = dto.Cliente.Apellido,
+                        FechaNacimiento = dto.Cliente.FechaNacimiento,
+                        Nacionalidad = dto.Cliente.Nacionalidad,
+                        Telefono = dto.Cliente.Telefono,
+                        Email = dto.Cliente.Email,
+                        Redes = dto.Cliente.Redes,
+                        CondicionMedica = dto.Cliente.CondicionMedica,
+                        EnfermedadPiel = dto.Cliente.EnfermedadPiel,
+                        Deporte = dto.Cliente.Deporte,
+                        Referencia = dto.Cliente.Referencia,
+                        Observaciones = dto.Cliente.Observaciones
+                    };
+                    cliente = _clienteService.CrearCliente(nuevoCliente);
+                }
+
+                // 2. VERIFICAR EDAD Y GESTIONAR TUTOR SI ES NECESARIO
+                bool esMenorDeEdad = false;
+                Tutor? tutor = null;
+
+                if (cliente.FechaNacimiento.HasValue)
+                {
+                    int edad = CalcularEdad(cliente.FechaNacimiento.Value);
+                    esMenorDeEdad = edad < EDAD_MAYORIA;
+
+                    if (esMenorDeEdad)
+                    {
+                        if (dto.Tutor == null)
+                        {
+                            throw new InvalidOperationException(
+                                $"El cliente es menor de edad ({edad} años). Se requiere un tutor."
+                            );
+                        }
+
+                        // Gestionar tutor (existente o nuevo)
+                        if (dto.Tutor.IdTutor.HasValue)
+                        {
+                            tutor = _tutorService.GetTutorById(dto.Tutor.IdTutor.Value);
+                        }
+                        else
+                        {
+                            var nuevoTutor = new Tutor
+                            {
+                                Identificacion = dto.Tutor.Identificacion,
+                                Nombre = dto.Tutor.Nombre,
+                                Apellido = dto.Tutor.Apellido,
+                                Parentezco = dto.Tutor.Parentezco
+                            };
+                            tutor = _tutorService.CrearTutor(nuevoTutor);
+                        }
+
+                        // Asignar tutor al cliente si no está ya asignado
+                        var tutoresCliente = _clienteService.GetTutoresByClienteId(cliente.IdCliente);
+                        if (!tutoresCliente.Any(t => t.IdTutor == tutor.IdTutor))
+                        {
+                            _clienteService.AsignarTutorACliente(cliente.IdCliente, tutor.IdTutor);
+                        }
+                    }
+                }
+
+                // 3. CREAR EL TATUAJE
+                var tatuaje = new Tatuaje
+                {
+                    IdCliente = cliente.IdCliente,
+                    Artista = dto.Tatuaje.Artista,
+                    Detalle = dto.Tatuaje.Detalle,
+                    Precio = dto.Tatuaje.Precio,
+                    ZonaTatuaje = dto.Tatuaje.ZonaTatuaje,
+                    Imagen = dto.Tatuaje.Imagen,
+                    EstadoPago = dto.Tatuaje.EstadoPago,
+                    RegistradoPor = dto.RegistradoPor
+                };
+                var tatuajeCreado = CrearTatuaje(tatuaje);
+
+                // 4. CREAR LA CITA
+                var cita = new CitaServicio
+                {
+                    Titulo = dto.Cita.Titulo ?? $"Tatuaje - {cliente.Nombre} {cliente.Apellido}",
+                    Descripcion = dto.Cita.Descripcion ?? dto.Tatuaje.Detalle,
+                    FechaInicio = dto.Cita.FechaInicio,
+                    FechaFin = dto.Cita.FechaFin,
+                    DuracionMinutos = dto.Cita.DuracionMinutos,
+                    Zona = dto.Cita.Zona ?? dto.Tatuaje.ZonaTatuaje,
+                    Estado = "pendiente"
+                };
+
+                // Crear la cita (puede incluir sincronización con Google Calendar)
+                var citaCreada = await _citaService.CrearCitaAsync(
+                    cita,
+                    cliente.Email,
+                    $"{cliente.Nombre} {cliente.Apellido}"
+                );
+
+                // 5. ASOCIAR CITA AL TATUAJE
+                AsignarCitaATatuaje(tatuajeCreado.IdTatuaje, citaCreada.IdCita);
+
+                // 6. OBTENER EL FORMULARIO SEGÚN LA EDAD
+                string eventoFormulario = esMenorDeEdad ? "tatuaje_menor_edad" : "tatuaje_mayor_edad";
+                var formulario = _formularioService.GetFormularioPorEvento(eventoFormulario);
+
+                // 7. PREPARAR LA RESPUESTA
+                var response = new RegistroTatuajeResponseDto
+                {
+                    Cliente = cliente,
+                    Tutor = tutor,
+                    Tatuaje = tatuajeCreado,
+                    Cita = citaCreada,
+                    EsMenorDeEdad = esMenorDeEdad,
+                    Formulario = formulario,
+                    FormularioHtml = formulario?.CuerpoHtml,
+                    Mensaje = esMenorDeEdad
+                        ? $"Tatuaje registrado exitosamente. Cliente menor de edad - Se requiere consentimiento del tutor."
+                        : "Tatuaje registrado exitosamente. Cliente mayor de edad."
+                };
+
+                await transaction.CommitAsync();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Error al registrar el tatuaje completo: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Calcula la edad basada en la fecha de nacimiento
+        /// </summary>
+        private int CalcularEdad(DateTime fechaNacimiento)
+        {
+            var hoy = DateTime.Today;
+            var edad = hoy.Year - fechaNacimiento.Year;
+
+            if (fechaNacimiento.Date > hoy.AddYears(-edad))
+            {
+                edad--;
+            }
+
+            return edad;
         }
     }
 }

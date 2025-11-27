@@ -1,3 +1,4 @@
+using Backend.DTOs;
 using Backend.Models;
 
 namespace Backend.Services.TatuajeService
@@ -16,5 +17,8 @@ namespace Backend.Services.TatuajeService
         CitaTatuaje AsignarCitaATatuaje(int idTatuaje, int idCita);
         bool DesasignarCitaDeTatuaje(int idTatuaje, int idCita);
         List<CitaServicio> GetCitasByTatuajeId(int idTatuaje);
+
+        // Nuevo método para registro completo de tatuaje
+        Task<RegistroTatuajeResponseDto> RegistrarTatuajeCompletoAsync(RegistroTatuajeDto dto);
     }
 }

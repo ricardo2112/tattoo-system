@@ -1,5 +1,6 @@
 using Backend.Models;
 using Backend.Services.CitaService;
+using Backend.Services.LoggingService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -9,10 +10,12 @@ namespace Backend.Controllers
     public class CitaController : ControllerBase
     {
         private readonly ICitaService _citaService;
+        private readonly ILoggingService _logger;
 
-        public CitaController(ICitaService citaService)
+        public CitaController(ICitaService citaService, ILoggingService logger)
         {
             _citaService = citaService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -90,25 +93,28 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CitaServicio> CrearCita([FromBody] CitaServicio cita)
+        public async Task<ActionResult<CitaServicio>> CrearCita([FromBody] CitaServicio cita, [FromQuery] string? clienteEmail = null, [FromQuery] string? clienteNombre = null)
         {
             try
             {
-                var nuevaCita = _citaService.CrearCita(cita);
+                
+                var nuevaCita = await _citaService.CrearCitaAsync(cita, clienteEmail, clienteNombre);
                 return CreatedAtAction(nameof(GetCitaById), new { id = nuevaCita.IdCita }, nuevaCita);
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning($"[API] Validación fallida al crear cita: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError("[API] Error al crear la cita", ex);
                 return StatusCode(500, new { message = "Error al crear la cita", error = ex.Message });
             }
         }
 
         [HttpPut("{id}")]
-        public ActionResult<CitaServicio> ActualizarCita(int id, [FromBody] CitaServicio cita)
+        public async Task<ActionResult<CitaServicio>> ActualizarCita(int id, [FromBody] CitaServicio cita, [FromQuery] string? clienteEmail = null, [FromQuery] string? clienteNombre = null)
         {
             if (id <= 0)
             {
@@ -117,25 +123,29 @@ namespace Backend.Controllers
 
             try
             {
-                var citaActualizada = _citaService.ActualizarCita(id, cita);
+                
+                var citaActualizada = await _citaService.ActualizarCitaAsync(id, cita, clienteEmail, clienteNombre);
                 return Ok(citaActualizada);
             }
             catch (KeyNotFoundException ex)
             {
+                _logger.LogWarning($"[API] Cita no encontrada: {ex.Message}");
                 return NotFound(new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning($"[API] Validación fallida al actualizar cita {id}: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError($"[API] Error al actualizar la cita {id}", ex);
                 return StatusCode(500, new { message = "Error al actualizar la cita", error = ex.Message });
             }
         }
 
         [HttpDelete("{id}")]
-        public ActionResult EliminarCita(int id)
+        public async Task<ActionResult> EliminarCita(int id)
         {
             if (id <= 0)
             {
@@ -144,15 +154,17 @@ namespace Backend.Controllers
 
             try
             {
-                var resultado = _citaService.EliminarCita(id);
+                var resultado = await _citaService.EliminarCitaAsync(id);
                 return Ok(new { message = "Cita eliminada exitosamente", success = resultado });
             }
             catch (KeyNotFoundException ex)
             {
+                _logger.LogWarning($"[API] Cita no encontrada para eliminar: {ex.Message}");
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError($"[API] Error al eliminar la cita {id}", ex);
                 return StatusCode(500, new { message = "Error al eliminar la cita", error = ex.Message });
             }
         }

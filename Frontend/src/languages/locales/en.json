@@ -64,15 +64,15 @@
           "description": "Client information",
           "button": "Access"
         },
-        "newSession": {
-          "title": "New Session",
-          "description": "Start therapy session",
-          "button": "Start"
+        "tattoo": {
+          "title": "Tattoo",
+          "description": "Tattoo Management",
+          "button": "Access"
         },
-        "statistics": {
-          "title": "Statistics",
-          "description": "View history and statistics",
-          "button": "View"
+        "piercing": {
+          "title": "Piercing",
+          "description": "Piercings Management",
+          "button": "Access"
         }
       }
     },
