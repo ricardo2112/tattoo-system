@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Local Imports
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { useDisclosure } from "@/hooks";
 import { Button } from "@/components/ui";
 import { getHeadings, HeadingItem } from "./utils";
@@ -59,7 +59,7 @@ export function Toc({ wrapperSelector }: TocProps) {
   const [headings, setHeadings] = useState<HeadingItem[]>([]);
   const { hash } = useLocation();
   const headingsRef = useRef<HeadingItem[]>([]);
-  const { lgAndUp } = useBreakpointsContext();
+  const { lgAndUp } = useBreakpointContext();
   const [isOpen, { open, close }] = useDisclosure(false);
 
   const filteredHeadings = headings.filter((heading) => heading.depth > 1);

@@ -15,7 +15,7 @@ import { Fragment, ElementType, ReactNode } from "react";
 
 // Local Imports
 import { Button } from "@/components/ui";
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { useDisclosure, useDidUpdate } from "@/hooks";
 
 // ----------------------------------------------------------------------
@@ -35,7 +35,7 @@ export function ContextualHelp(props: ContextualHelpProps) {
     anchor = { to: "bottom start", gap: 8 },
   } = props;
 
-  const { smAndDown, name } = useBreakpointsContext();
+  const { smAndDown, name } = useBreakpointContext();
   const [isOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
 
   useDidUpdate(() => closeModal(), [name]);

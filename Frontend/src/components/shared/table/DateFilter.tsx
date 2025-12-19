@@ -10,7 +10,7 @@ import React from "react";
 import { Button } from "@/components/ui";
 import { useLocaleContext } from "@/app/contexts/locale/context";
 import { DatePicker } from "../form/Datepicker";
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { ResponsiveFilter } from "./ResponsiveFilter";
 import { BaseOptions, DateOption } from "../form/Flatpickr";
 
@@ -27,7 +27,7 @@ export const DateFilter = React.memo(({
 }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => column?.setFilterValue(undefined), []);
-  const { smAndDown } = useBreakpointsContext();
+  const { smAndDown } = useBreakpointContext();
   const selectedValues = column?.getFilterValue() as DateOption[] | undefined;
 
   const { locale } = useLocaleContext();

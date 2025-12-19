@@ -15,6 +15,8 @@ import {
   PlusIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
+  PrinterIcon,
+  DocumentArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import { FaUser } from "react-icons/fa6";
 import { IoBody } from "react-icons/io5";
@@ -22,10 +24,16 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { tatuajeService } from "@/services/tatuajeService";
 import { clienteService } from "@/services/clienteService";
+import { useDisclosure } from "@/hooks";
+import { RegistrarPagoModal } from "./components/RegistrarPagoModal";
+import { procesarFormulario } from "@/utils/formularioProcessor";
+import { formularioTatuajeTemplate } from "@/templates/formularioTatuajeTemplate";
+import { generarPDFFormulario } from "@/utils/pdfGenerator";
 import type { Tatuaje } from "@/types/tatuaje";
 import type { Cliente } from "@/types/cliente";
 import type { Pago } from "@/types/pago";
 import type { Cita } from "@/types/cita";
+import type { RegistroTatuajeResponse } from "@/types/registroTatuaje";
 
 interface TatuajeWithDetails extends Tatuaje {
   cliente?: Cliente;
@@ -39,6 +47,8 @@ export default function TatuajeDetail() {
 
   const [loading, setLoading] = useState(true);
   const [tatuaje, setTatuaje] = useState<TatuajeWithDetails | null>(null);
+  const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   useEffect(() => {
     loadTatuajeData();
@@ -90,7 +100,101 @@ export default function TatuajeDetail() {
   };
 
   const handleAddPayment = () => {
-    console.log("Agregar pago");
+    openModal();
+  };
+
+  const handlePaymentSuccess = () => {
+    loadTatuajeData();
+  };
+
+  // Función para generar el HTML del formulario
+  const getFormularioHtml = (): string => {
+    if (!tatuaje || !tatuaje.cliente) return "";
+
+    // Construir un objeto RegistroTatuajeResponse con los datos del tatuaje
+    const registroResponse: RegistroTatuajeResponse = {
+      cliente: tatuaje.cliente,
+      tatuaje: tatuaje,
+      pago: tatuaje.pagos?.[0] || null,
+      cita: tatuaje.citas?.[0] || ({} as any),
+      esMenorDeEdad: false, // Puedes calcular esto basándote en la fecha de nacimiento
+      mensaje: "",
+    };
+
+    return procesarFormulario(formularioTatuajeTemplate, registroResponse);
+  };
+
+  // Función para imprimir el formulario
+  const handlePrintFormulario = () => {
+    const htmlContent = getFormularioHtml();
+    if (!htmlContent) return;
+
+    // Crear un iframe temporal
+    const printFrame = document.createElement("iframe");
+    printFrame.style.position = "absolute";
+    printFrame.style.width = "0";
+    printFrame.style.height = "0";
+    printFrame.style.border = "none";
+    document.body.appendChild(printFrame);
+
+    const iframeDoc = printFrame.contentDocument || printFrame.contentWindow?.document;
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(htmlContent);
+      iframeDoc.close();
+
+      // Esperar a que se cargue el contenido antes de imprimir
+      printFrame.onload = () => {
+        printFrame.contentWindow?.print();
+        // Remover el iframe después de imprimir
+        setTimeout(() => {
+          document.body.removeChild(printFrame);
+        }, 1000);
+      };
+
+      // Fallback si onload no se dispara
+      setTimeout(() => {
+        if (document.body.contains(printFrame)) {
+          printFrame.contentWindow?.print();
+          setTimeout(() => {
+            if (document.body.contains(printFrame)) {
+              document.body.removeChild(printFrame);
+            }
+          }, 1000);
+        }
+      }, 500);
+    }
+  };
+
+  // Función para descargar el formulario como PDF
+  const handleDownloadPDF = () => {
+    const htmlContent = getFormularioHtml();
+    if (!htmlContent) return;
+
+    setIsGeneratingPDF(true);
+
+    try {
+      // Generar nombre de archivo
+      const clienteName = tatuaje?.cliente
+        ? `${tatuaje.cliente.nombre}_${tatuaje.cliente.apellido}`
+        : "Cliente";
+      const now = new Date();
+      const dateStr = now.toISOString().split("T")[0];
+      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+      const fileName = `Formulario_Consentimiento_${clienteName}_${dateStr}_${timeStr}.pdf`;
+
+      // Generar PDF con texto seleccionable usando la función personalizada
+      const pdf = generarPDFFormulario(htmlContent);
+      pdf.save(fileName);
+
+    } catch (error: any) {
+      console.error("Error al generar PDF:", error);
+      console.error("Error stack:", error?.stack);
+      console.error("Error message:", error?.message);
+      alert(`Ocurrió un error al generar el PDF: ${error?.message || 'Error desconocido'}`);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   const formatCurrency = (amount?: number) => {
@@ -186,6 +290,17 @@ export default function TatuajeDetail() {
 
   return (
     <Page title={tatuaje.detalle || `Tatuaje #${tatuaje.idTatuaje}`}>
+      {/* Modal de Registro de Pago */}
+      {tatuaje && (
+        <RegistrarPagoModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          idTatuaje={tatuaje.idTatuaje}
+          onSuccess={handlePaymentSuccess}
+          montoPendiente={pendiente}
+        />
+      )}
+
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -334,6 +449,29 @@ export default function TatuajeDetail() {
                 </div>
               </div>
             </Card>
+
+            {/* Botones de Formulario de Consentimiento */}
+            <div className="mt-4 space-y-3">
+              <Button
+                onClick={handlePrintFormulario}
+                variant="outlined"
+                color="primary"
+                className="w-full flex items-center justify-center gap-2 py-3"
+              >
+                <PrinterIcon className="size-5" />
+                Imprimir Consentimiento
+              </Button>
+              <Button
+                onClick={handleDownloadPDF}
+                variant="filled"
+                color="primary"
+                className="w-full flex items-center justify-center gap-2 py-3"
+                disabled={isGeneratingPDF}
+              >
+                <DocumentArrowDownIcon className="size-5" />
+                {isGeneratingPDF ? "Generando PDF..." : "Descargar Consentimiento"}
+              </Button>
+            </div>
           </div>
 
           {/* Detalles del Tatuaje - Main Content */}

@@ -13,7 +13,7 @@ import invariant from "tiny-invariant";
 
 // Local Imports
 import { Badge, Button, Checkbox, Input } from "@/components/ui";
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { useFuse } from "@/hooks";
 import { ResponsiveFilter } from "./ResponsiveFilter";
 
@@ -68,7 +68,7 @@ function Content({
 }) {
   const selectedValues = table?.getState()?.toolbarFilters || [];
   const inputRef = useRef<HTMLInputElement>(null);
-  const { smAndUp } = useBreakpointsContext();
+  const { smAndUp } = useBreakpointContext();
   const setToolbarFilters = table?.options?.meta?.setToolbarFilters;
 
   invariant(setToolbarFilters, "setToolbarFilters is required");
@@ -88,8 +88,8 @@ function Content({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleChange = (list: FilterOption[]) => {
-    setToolbarFilters(list?.map((item) => item.value));
+  const handleChange = (list: (FilterOption | undefined)[]) => {
+    setToolbarFilters(list?.filter((item): item is FilterOption => item !== undefined).map((item) => item.value));
   };
 
   return (

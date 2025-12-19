@@ -85,7 +85,7 @@ export function TutorStep({
           <div className="flex gap-4">
             <Button
               onClick={() => setModoTutor("seleccionar")}
-              variant={modoTutor === "seleccionar" ? "default" : "outlined"}
+              variant={modoTutor === "seleccionar" ? "filled" : "outlined"}
               className="flex-1"
             >
               <UserIcon className="mr-2 size-5" />
@@ -93,7 +93,7 @@ export function TutorStep({
             </Button>
             <Button
               onClick={() => setModoTutor("crear")}
-              variant={modoTutor === "crear" ? "default" : "outlined"}
+              variant={modoTutor === "crear" ? "filled" : "outlined"}
               className="flex-1"
             >
               <UserPlusIcon className="mr-2 size-5" />
@@ -238,11 +238,16 @@ export function TutorStep({
 
                 <div>
                   <label className="mb-2 block text-sm font-medium">Parentezco</label>
-                  <Input
+                  <select
                     value={nuevoTutor.parentezco || ""}
                     onChange={(e) => handleNuevoTutorChange("parentezco", e.target.value)}
-                    placeholder="Ej: Madre, Padre, Tutor Legal"
-                  />
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-dark-500 dark:bg-dark-600 dark:text-white"
+                  >
+                    <option value="">Seleccione una opción</option>
+                    <option value="Padre">Padre</option>
+                    <option value="Madre">Madre</option>
+                    <option value="Tutor">Tutor</option>
+                  </select>
                 </div>
               </div>
             </div>

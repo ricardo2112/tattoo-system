@@ -24,9 +24,9 @@ function Breadcrumbs({
   className,
   ...rest
 }: BreadcrumbsProps): ReactNode {
-  const { isRtl } = useLocaleContext();
+  const { direction } = useLocaleContext();
 
-  const SeparatorIcon = isRtl ? ChevronLeftIcon : ChevronRightIcon;
+  const SeparatorIcon = direction === "rtl" ? ChevronLeftIcon : ChevronRightIcon;
 
   return (
     <ul

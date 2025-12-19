@@ -7,7 +7,7 @@ import {
   CubeIcon,
   CurrencyDollarIcon,
 } from "@heroicons/react/24/solid";
-import { BookOpenIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import { BookmarkIcon, BookOpenIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import { FaEraser } from "react-icons/fa";
 import { GiSkullRing, GiSkullWithSyringe, GiTripleSkulls } from "react-icons/gi";
 import clsx from "clsx";
@@ -47,6 +47,7 @@ export default function Sidebar() {
     { nameKey: "navigation.items.inventory", path: "/modules/inventario", icon: CubeIcon, category: "management" },
     { nameKey: "navigation.items.finances", path: "/modules/finanzas", icon: CurrencyDollarIcon, category: "management" },
     { nameKey: "navigation.items.users", path: "/modules/usuarios", icon: UsersIcon, category: "management" },
+    { nameKey: "Formularios", path: "/modules/formularios", icon: BookmarkIcon, category: "management" },
     { nameKey: "navigation.items.catalog", path: "/settings/catalogos", icon: BookOpenIcon, category: "settings" },
     { nameKey: "navigation.items.settings", path: "/settings/general", icon: Cog6ToothIcon, category: "settings" },
   ];

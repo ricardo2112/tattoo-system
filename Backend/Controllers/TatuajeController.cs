@@ -122,6 +122,7 @@ namespace Backend.Controllers
             }
         }
 
+
         [HttpPost("{idTatuaje}/pagos/{idPago}")]
         public ActionResult<PagoTatuaje> RegistrarPagoTatuaje(int idTatuaje, int idPago)
         {
@@ -282,6 +283,11 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<RegistroTatuajeResponseDto>> RegistrarTatuajeCompleto([FromBody] RegistroTatuajeDto dto)
         {
+            Console.WriteLine("=== CONTROLLER: RegistrarTatuajeCompleto ===");
+            Console.WriteLine($"DTO recibido - RegistradoPor: {dto?.RegistradoPor}");
+            Console.WriteLine($"Cliente.IdCliente: {dto?.Cliente?.IdCliente}");
+            Console.WriteLine($"Cliente.Nombre: {dto?.Cliente?.Nombre}");
+
             if (dto == null)
             {
                 return BadRequest(new { message = "Los datos del registro son requeridos" });
@@ -326,6 +332,8 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"ERROR en controller: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
                 return StatusCode(500, new
                 {
                     message = "Error al registrar el tatuaje completo",

@@ -106,7 +106,7 @@ namespace Backend.Services.CitaService
                     FechaFin = cita.FechaFin,
                     DuracionMinutos = duracionCalculada, // Se calcula automáticamente
                     Zona = string.IsNullOrWhiteSpace(cita.Zona) ? CitaServicio.NOMBRE_ESTUDIO : cita.Zona,
-                    Estado = cita.Estado ?? "pendiente"
+                    Estado = cita.Estado ?? "Confirmada"
                 };
 
                 // Guardar primero en la base de datos

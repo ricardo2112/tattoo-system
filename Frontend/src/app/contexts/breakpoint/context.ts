@@ -5,6 +5,13 @@ export interface BreakpointContextValue {
   isTablet: boolean;
   isDesktop: boolean;
   breakpoint: "mobile" | "tablet" | "desktop";
+  // Computed properties for convenience
+  smAndDown: boolean;
+  smAndUp: boolean;
+  lgAndUp: boolean;
+  isXl: boolean;
+  is2xl: boolean;
+  name: string;
 }
 
 export const [BreakpointContext, useBreakpointContext] =

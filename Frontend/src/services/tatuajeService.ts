@@ -32,8 +32,11 @@ export const tatuajeService = {
     return response.data;
   },
 
-  async create(tatuaje: Partial<Tatuaje>): Promise<Tatuaje> {
-    const response = await axiosInstance.post<Tatuaje>(ENDPOINT, tatuaje);
+  async registrarCompleto(data: RegistroTatuajeDto): Promise<RegistroTatuajeResponse> {
+    console.log("--- Enviando al backend ---");
+    console.log("Data a enviar:", data);
+    console.log("Cliente ID enviado:", data.cliente.idCliente);
+    const response = await axiosInstance.post<RegistroTatuajeResponse>(ENDPOINT, data);
     return response.data;
   },
 
@@ -46,9 +49,8 @@ export const tatuajeService = {
     await axiosInstance.delete(`${ENDPOINT}/${id}`);
   },
 
-  // Nuevo endpoint para registro completo de tatuaje
-  async registrarCompleto(data: RegistroTatuajeDto): Promise<RegistroTatuajeResponse> {
-    const response = await axiosInstance.post<RegistroTatuajeResponse>(`${ENDPOINT}/registrar-completo`, data);
+  async registrarPago(idTatuaje: number, idPago: number): Promise<void> {
+    const response = await axiosInstance.post(`${ENDPOINT}/${idTatuaje}/pagos/${idPago}`);
     return response.data;
   },
 };

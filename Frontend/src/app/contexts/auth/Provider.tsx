@@ -3,14 +3,6 @@ import { AuthContext, type AuthContextValue, User } from "./context";
 
 // ----------------------------------------------------------------------
 
-const initialState: AuthContextValue = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => {},
-  logout: () => {},
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, _password: string) => {
     try {
       // Aquí harías la petición al backend
       // Por ahora, simulamos un usuario

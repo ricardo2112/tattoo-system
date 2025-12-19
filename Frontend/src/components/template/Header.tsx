@@ -1,4 +1,3 @@
-import { useAuthContext } from "@/app/contexts/auth/context";
 import { useThemeContext } from "@/app/contexts/theme/context";
 import { useLocaleContext } from "@/app/contexts/locale/context";
 import { Avatar } from "@/components/ui";
@@ -41,7 +40,6 @@ const languageOptions: LanguageOption[] = [
  * Header component with user greeting and theme selector
  */
 export default function Header() {
-  const { user } = useAuthContext();
   const { themeMode, setThemeMode } = useThemeContext();
   const { locale, setLocale } = useLocaleContext();
   const { t } = useTranslation();
@@ -56,7 +54,7 @@ export default function Header() {
   const currentTheme = themeOptions.find(opt => opt.value === themeMode) || themeOptions[0];
 
   const handleLanguageChange = (language: LanguageOption) => {
-    setLocale(language.code);
+    setLocale(language.code as "en" | "es");
   };
 
   return (

@@ -13,7 +13,7 @@ import { useEffect, useRef, ElementType, ReactElement } from "react";
 import { Badge, Button, Checkbox, Input } from "@/components/ui";
 import { useFuse } from "@/hooks";
 import { ResponsiveFilter } from "./ResponsiveFilter";
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { Column } from "@tanstack/react-table";
 
 // ----------------------------------------------------------------------
@@ -119,7 +119,7 @@ function ComboboxFilter({
     matchAllOnEmptyQuery: true,
   });
 
-  const { smAndUp } = useBreakpointsContext();
+  const { smAndUp } = useBreakpointContext();
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = column?.getFilterValue() as string[] || [];
 

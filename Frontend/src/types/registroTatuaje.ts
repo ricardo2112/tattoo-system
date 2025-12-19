@@ -3,6 +3,7 @@ import type { Tutor } from './tutor';
 import type { Tatuaje } from './tatuaje';
 import type { Cita } from './cita';
 import type { Formulario } from './formulario';
+import type { Pago } from './pago';
 
 export interface ClienteDto {
   idCliente?: number;
@@ -38,6 +39,12 @@ export interface TatuajeDto {
   estadoPago: string;
 }
 
+export interface PagoDto {
+  monto: number;
+  formaPago?: string;
+  fechaPago?: string;
+}
+
 export interface CitaDto {
   titulo?: string;
   descripcion?: string;
@@ -51,6 +58,7 @@ export interface RegistroTatuajeDto {
   cliente: ClienteDto;
   tutor?: TutorDto | null;
   tatuaje: TatuajeDto;
+  pago?: PagoDto | null;
   cita: CitaDto;
   registradoPor: number;
 }
@@ -59,6 +67,7 @@ export interface RegistroTatuajeResponse {
   cliente: Cliente;
   tutor?: Tutor | null;
   tatuaje: Tatuaje;
+  pago?: Pago | null;
   cita: Cita;
   esMenorDeEdad: boolean;
   formulario?: Formulario | null;

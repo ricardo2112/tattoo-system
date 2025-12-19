@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Local Imports
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { useDisclosure } from "@/hooks";
 import { Button } from "@/components/ui";
 
@@ -33,7 +33,7 @@ interface ItemProps {
 }
 
 export function DocsNavigation({ prefix, items, title }: DocsNavigationProps) {
-  const { lgAndUp } = useBreakpointsContext();
+  const { lgAndUp } = useBreakpointContext();
   const [isOpen, { open, close }] = useDisclosure(false);
 
   if (!lgAndUp) {

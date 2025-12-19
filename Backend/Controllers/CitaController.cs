@@ -144,31 +144,6 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> EliminarCita(int id)
-        {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "El ID de la cita debe ser un número positivo" });
-            }
-
-            try
-            {
-                var resultado = await _citaService.EliminarCitaAsync(id);
-                return Ok(new { message = "Cita eliminada exitosamente", success = resultado });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning($"[API] Cita no encontrada para eliminar: {ex.Message}");
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[API] Error al eliminar la cita {id}", ex);
-                return StatusCode(500, new { message = "Error al eliminar la cita", error = ex.Message });
-            }
-        }
-
         [HttpGet("{idCita}/tatuajes")]
         public ActionResult<List<Tatuaje>> GetTatuajesByCitaId(int idCita)
         {

@@ -112,6 +112,30 @@ const protectedRoutes: RouteObject = {
               }),
             },
 
+            {
+              path: "formularios",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/formularios/index")
+                ).default,
+              }),
+            },
+            {
+              path: "formularios/nuevo",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/formularios/form")
+                ).default,
+              }),
+            },
+            {
+              path: "formularios/editar/:id",
+              lazy: async () => ({
+                Component: (
+                  await import("@/app/pages/modules/formularios/form")
+                ).default,
+              }),
+            },
 
           ],
         },

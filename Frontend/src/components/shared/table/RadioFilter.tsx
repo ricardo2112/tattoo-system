@@ -12,7 +12,7 @@ import { Column } from "@tanstack/react-table";
 
 // Local Imports
 import { Badge, Button, Input, Radio } from "@/components/ui";
-import { useBreakpointsContext } from "@/app/contexts/breakpoint/context";
+import { useBreakpointContext } from "@/app/contexts/breakpoint/context";
 import { useFuse } from "@/hooks";
 import { ResponsiveFilter } from "./ResponsiveFilter";
 import { compareArrays } from "@/utils/compareArrays";
@@ -71,7 +71,7 @@ export function RadioFilter({
 
 function Content({ column, title, options }: ContentProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { smAndDown } = useBreakpointsContext();
+  const { smAndDown } = useBreakpointContext();
 
   const {
     result: filteredItems,

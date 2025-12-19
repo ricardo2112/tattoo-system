@@ -180,19 +180,52 @@ namespace Backend.Services.FormularioService
                     throw new KeyNotFoundException($"El evento con ID {idEvento} no existe");
                 }
 
-                var formularioExiste = _context.Formularios.Any(f => f.IdFormulario == idFormulario);
-                if (!formularioExiste)
+                var formulario = _context.Formularios.Find(idFormulario);
+                if (formulario == null)
                 {
                     throw new KeyNotFoundException($"El formulario con ID {idFormulario} no existe");
                 }
 
+                // REGLA 1: Un formulario solo puede estar asignado a un evento
+                // Verificar si el formulario ya está asignado a otro evento
+                var formularioYaAsignado = _context.EventoFormularios
+                    .Any(ef => ef.IdFormulario == idFormulario && ef.IdEvento != idEvento);
+
+                if (formularioYaAsignado)
+                {
+                    throw new InvalidOperationException("El formulario ya está asignado a otro evento. Un formulario solo puede estar asignado a un evento a la vez.");
+                }
+
+                // REGLA 2: Si el evento ya tiene un formulario asignado, desactivarlo primero
+                if (evento.IdFormulario != null && evento.IdFormulario != idFormulario)
+                {
+                    var formularioAnterior = _context.Formularios.Find(evento.IdFormulario);
+                    if (formularioAnterior != null)
+                    {
+                        formularioAnterior.Activo = false;
+                        formularioAnterior.FechaActualizacion = DateTime.Now;
+                        _context.Formularios.Update(formularioAnterior);
+                    }
+                }
+
+                // Asignar el nuevo formulario al evento
                 evento.IdFormulario = idFormulario;
                 _context.EventoFormularios.Update(evento);
+
+                // REGLA 3: Activar el formulario cuando se asigna a un evento
+                formulario.Activo = true;
+                formulario.FechaActualizacion = DateTime.Now;
+                _context.Formularios.Update(formulario);
+
                 _context.SaveChanges();
 
                 return evento;
             }
             catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (InvalidOperationException)
             {
                 throw;
             }
@@ -210,6 +243,18 @@ namespace Backend.Services.FormularioService
                 if (evento == null)
                 {
                     throw new KeyNotFoundException($"El evento con ID {idEvento} no existe");
+                }
+
+                // Si el evento tiene un formulario asignado, desactivarlo
+                if (evento.IdFormulario != null)
+                {
+                    var formulario = _context.Formularios.Find(evento.IdFormulario);
+                    if (formulario != null)
+                    {
+                        formulario.Activo = false;
+                        formulario.FechaActualizacion = DateTime.Now;
+                        _context.Formularios.Update(formulario);
+                    }
                 }
 
                 evento.IdFormulario = null;

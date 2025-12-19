@@ -5,6 +5,7 @@ using Backend.Services.ClienteService;
 using Backend.Services.CitaService;
 using Backend.Services.FormularioService;
 using Backend.Services.TutorService;
+using Backend.Services.PagoService;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.TatuajeService
@@ -16,6 +17,7 @@ namespace Backend.Services.TatuajeService
         private readonly ICitaService _citaService;
         private readonly ITutorService _tutorService;
         private readonly IFormularioService _formularioService;
+        private readonly IPagoService _pagoService;
         private const int EDAD_MAYORIA = 18;
 
         public TatuajeService(
@@ -23,13 +25,15 @@ namespace Backend.Services.TatuajeService
             IClienteService clienteService,
             ICitaService citaService,
             ITutorService tutorService,
-            IFormularioService formularioService)
+            IFormularioService formularioService,
+            IPagoService pagoService)
         {
             _context = context;
             _clienteService = clienteService;
             _citaService = citaService;
             _tutorService = tutorService;
             _formularioService = formularioService;
+            _pagoService = pagoService;
         }
 
         public List<Tatuaje> GetAllTatuajes()
@@ -119,10 +123,13 @@ namespace Backend.Services.TatuajeService
         {
             try
             {
+                Console.WriteLine($"CrearTatuaje - IdCliente: {tatuaje.IdCliente}, RegistradoPor: {tatuaje.RegistradoPor}");
+
                 // Validar que el cliente exista
                 var clienteExiste = _context.Clientes.Any(c => c.IdCliente == tatuaje.IdCliente);
                 if (!clienteExiste)
                 {
+                    Console.WriteLine($"ERROR: El cliente con ID {tatuaje.IdCliente} no existe");
                     throw new KeyNotFoundException($"El cliente con ID {tatuaje.IdCliente} no existe");
                 }
 
@@ -130,6 +137,8 @@ namespace Backend.Services.TatuajeService
                 var usuarioExiste = _context.Usuarios.Any(u => u.IdUsuario == tatuaje.RegistradoPor);
                 if (!usuarioExiste)
                 {
+                    Console.WriteLine($"ERROR: El usuario con ID {tatuaje.RegistradoPor} no existe");
+                    Console.WriteLine($"Usuarios disponibles: {string.Join(", ", _context.Usuarios.Select(u => u.IdUsuario).ToList())}");
                     throw new KeyNotFoundException($"El usuario con ID {tatuaje.RegistradoPor} no existe");
                 }
 
@@ -481,19 +490,26 @@ namespace Backend.Services.TatuajeService
         /// </summary>
         public async Task<RegistroTatuajeResponseDto> RegistrarTatuajeCompletoAsync(RegistroTatuajeDto dto)
         {
+            Console.WriteLine("=== SERVICE: RegistrarTatuajeCompletoAsync ===");
+            Console.WriteLine($"DTO.RegistradoPor: {dto.RegistradoPor}");
+            Console.WriteLine($"DTO.Cliente.IdCliente: {dto.Cliente.IdCliente}");
+
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
                 // 1. GESTIÓN DEL CLIENTE (existente o nuevo)
                 Cliente cliente;
-                if (dto.Cliente.IdCliente.HasValue)
+                if (dto.Cliente.IdCliente.HasValue && dto.Cliente.IdCliente.Value > 0)
                 {
+                    Console.WriteLine($"Buscando cliente existente con ID: {dto.Cliente.IdCliente.Value}");
                     // Cliente existente
                     cliente = _clienteService.GetClienteById(dto.Cliente.IdCliente.Value);
+                    Console.WriteLine($"Cliente encontrado: {cliente.Nombre} {cliente.Apellido}");
                 }
                 else
                 {
+                    Console.WriteLine("Creando nuevo cliente...");
                     // Crear nuevo cliente
                     var nuevoCliente = new Cliente
                     {
@@ -512,6 +528,7 @@ namespace Backend.Services.TatuajeService
                         Observaciones = dto.Cliente.Observaciones
                     };
                     cliente = _clienteService.CrearCliente(nuevoCliente);
+                    Console.WriteLine($"Nuevo cliente creado con ID: {cliente.IdCliente}");
                 }
 
                 // 2. VERIFICAR EDAD Y GESTIONAR TUTOR SI ES NECESARIO
@@ -533,7 +550,7 @@ namespace Backend.Services.TatuajeService
                         }
 
                         // Gestionar tutor (existente o nuevo)
-                        if (dto.Tutor.IdTutor.HasValue)
+                        if (dto.Tutor.IdTutor.HasValue && dto.Tutor.IdTutor.Value > 0)
                         {
                             tutor = _tutorService.GetTutorById(dto.Tutor.IdTutor.Value);
                         }
@@ -559,6 +576,7 @@ namespace Backend.Services.TatuajeService
                 }
 
                 // 3. CREAR EL TATUAJE
+                Console.WriteLine($"Creando tatuaje con RegistradoPor: {dto.RegistradoPor}");
                 var tatuaje = new Tatuaje
                 {
                     IdCliente = cliente.IdCliente,
@@ -570,7 +588,9 @@ namespace Backend.Services.TatuajeService
                     EstadoPago = dto.Tatuaje.EstadoPago,
                     RegistradoPor = dto.RegistradoPor
                 };
+                Console.WriteLine($"Tatuaje.RegistradoPor antes de crear: {tatuaje.RegistradoPor}");
                 var tatuajeCreado = CrearTatuaje(tatuaje);
+                Console.WriteLine($"Tatuaje creado con ID: {tatuajeCreado.IdTatuaje}");
 
                 // 4. CREAR LA CITA
                 var cita = new CitaServicio
@@ -581,7 +601,7 @@ namespace Backend.Services.TatuajeService
                     FechaFin = dto.Cita.FechaFin,
                     DuracionMinutos = dto.Cita.DuracionMinutos,
                     Zona = dto.Cita.Zona ?? dto.Tatuaje.ZonaTatuaje,
-                    Estado = "pendiente"
+                    Estado = "Confirmada"
                 };
 
                 // Crear la cita (puede incluir sincronización con Google Calendar)
@@ -594,23 +614,45 @@ namespace Backend.Services.TatuajeService
                 // 5. ASOCIAR CITA AL TATUAJE
                 AsignarCitaATatuaje(tatuajeCreado.IdTatuaje, citaCreada.IdCita);
 
-                // 6. OBTENER EL FORMULARIO SEGÚN LA EDAD
+                // 6. CREAR Y ASOCIAR PAGO SI HAY ABONO
+                Pago? pagoCreado = null;
+                if (dto.Pago != null && dto.Pago.Monto > 0)
+                {
+                    var pago = new Pago
+                    {
+                        Monto = dto.Pago.Monto,
+                        FormaPago = dto.Pago.FormaPago ?? "Efectivo",
+                        FechaPago = dto.Pago.FechaPago ?? DateTime.Now
+                    };
+
+                    pagoCreado = _pagoService.CrearPago(pago);
+
+                    // Asociar el pago al tatuaje mediante PagoTatuaje
+                    RegistrarPagoTatuaje(tatuajeCreado.IdTatuaje, pagoCreado.IdPago);
+                }
+
+                // 7. OBTENER EL FORMULARIO SEGÚN LA EDAD
                 string eventoFormulario = esMenorDeEdad ? "tatuaje_menor_edad" : "tatuaje_mayor_edad";
                 var formulario = _formularioService.GetFormularioPorEvento(eventoFormulario);
 
-                // 7. PREPARAR LA RESPUESTA
+                // 8. PREPARAR LA RESPUESTA
+                string mensajePago = pagoCreado != null
+                    ? $" Se registró un abono de ${pagoCreado.Monto:F2} USD."
+                    : "";
+
                 var response = new RegistroTatuajeResponseDto
                 {
                     Cliente = cliente,
                     Tutor = tutor,
                     Tatuaje = tatuajeCreado,
+                    Pago = pagoCreado,
                     Cita = citaCreada,
                     EsMenorDeEdad = esMenorDeEdad,
                     Formulario = formulario,
                     FormularioHtml = formulario?.CuerpoHtml,
                     Mensaje = esMenorDeEdad
-                        ? $"Tatuaje registrado exitosamente. Cliente menor de edad - Se requiere consentimiento del tutor."
-                        : "Tatuaje registrado exitosamente. Cliente mayor de edad."
+                        ? $"Tatuaje registrado exitosamente. Cliente menor de edad - Se requiere consentimiento del tutor.{mensajePago}"
+                        : $"Tatuaje registrado exitosamente. Cliente mayor de edad.{mensajePago}"
                 };
 
                 await transaction.CommitAsync();

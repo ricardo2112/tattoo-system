@@ -16,6 +16,9 @@ namespace Backend.DTOs
         // Información del tatuaje
         public TatuajeDto Tatuaje { get; set; } = new TatuajeDto();
 
+        // Información del pago inicial (abono)
+        public PagoDto? Pago { get; set; }
+
         // Información de la cita
         public CitaDto Cita { get; set; } = new CitaDto();
 
@@ -70,6 +73,13 @@ namespace Backend.DTOs
         public string EstadoPago { get; set; } = "parcial";
     }
 
+    public class PagoDto
+    {
+        public double Monto { get; set; }
+        public string? FormaPago { get; set; }
+        public DateTime? FechaPago { get; set; }
+    }
+
     public class CitaDto
     {
         public string? Titulo { get; set; }
@@ -88,6 +98,7 @@ namespace Backend.DTOs
         public Cliente Cliente { get; set; } = null!;
         public Tutor? Tutor { get; set; }
         public Tatuaje Tatuaje { get; set; } = null!;
+        public Pago? Pago { get; set; }
         public CitaServicio Cita { get; set; } = null!;
         public bool EsMenorDeEdad { get; set; }
         public Formulario? Formulario { get; set; }

@@ -164,13 +164,17 @@ namespace Backend.Controllers
                 var eventoFormulario = _formularioService.AsignarFormularioAEvento(idEvento, idFormulario);
                 return Ok(new
                 {
-                    message = "Formulario asignado al evento exitosamente",
+                    message = "Formulario asignado al evento exitosamente. El formulario anterior ha sido desactivado automáticamente.",
                     data = eventoFormulario
                 });
             }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {

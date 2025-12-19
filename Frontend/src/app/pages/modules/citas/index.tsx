@@ -38,6 +38,8 @@ import { citaService } from "@/services/citaService";
 import type { Cita } from "@/types/cita";
 import { format, parseISO, isToday, isBefore, isAfter, startOfToday, addMinutes } from "date-fns";
 import { es } from "date-fns/locale";
+import { DatePicker } from "@/components/shared/form/Datepicker";
+import { formatLocalISO, buildLocalDateTime } from "@/utils/dateUtils";
 
 type FilterType = "today" | "past" | "future" | "all";
 
@@ -70,7 +72,7 @@ export default function Citas() {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   // Form state
   const [formData, setFormData] = useState<CitaFormData>({
@@ -80,7 +82,38 @@ export default function Citas() {
     fechaFin: "",
   });
 
+  // Estados separados para el DatePicker
+  const [fechaSeleccionada, setFechaSeleccionada] = useState<string>("");
+  const [horaInicio, setHoraInicio] = useState<string>("");
+  const [horaFin, setHoraFin] = useState<string>("");
+
   const saveRef = useRef(null);
+
+  // Sincronizar fechaSeleccionada, horaInicio y horaFin con formData
+  useEffect(() => {
+    if (fechaSeleccionada && horaInicio && horaFin) {
+      const inicio = buildLocalDateTime(fechaSeleccionada, horaInicio);
+      const fin = buildLocalDateTime(fechaSeleccionada, horaFin);
+
+      setFormData(prev => ({
+        ...prev,
+        fechaInicio: formatLocalISO(inicio),
+        fechaFin: formatLocalISO(fin),
+      }));
+    }
+  }, [fechaSeleccionada, horaInicio, horaFin]);
+
+  // Auto-actualizar hora de fin cuando cambia hora de inicio (30 minutos después)
+  useEffect(() => {
+    if (horaInicio && !horaFin && !selectedCita) {
+      const [hours, minutes] = horaInicio.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes + 30;
+      const newHour = Math.floor(totalMinutes / 60) % 24;
+      const newMinutes = totalMinutes % 60;
+      const newTime = `${String(newHour).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+      setHoraFin(newTime);
+    }
+  }, [horaInicio, horaFin, selectedCita]);
 
   // Load data
   useEffect(() => {
@@ -190,11 +223,16 @@ export default function Citas() {
 
     const endTime = addMinutes(now, 30); // 30 minutes by default
 
+    // Inicializar estados separados para DatePicker
+    setFechaSeleccionada(format(now, "yyyy-MM-dd"));
+    setHoraInicio(format(now, "HH:mm"));
+    setHoraFin(format(endTime, "HH:mm"));
+
     setFormData({
       titulo: "Visita de Consulta",
       descripcion: "",
-      fechaInicio: format(now, "yyyy-MM-dd'T'HH:mm"),
-      fechaFin: format(endTime, "yyyy-MM-dd'T'HH:mm"),
+      fechaInicio: "",
+      fechaFin: "",
     });
     setSelectedCita(null);
     setError(null);
@@ -204,11 +242,20 @@ export default function Citas() {
   // Handle edit
   const handleEdit = (cita: Cita) => {
     setSelectedCita(cita);
+
+    const inicioDate = parseISO(cita.fechaInicio);
+    const finDate = parseISO(cita.fechaFin);
+
+    // Inicializar estados separados para DatePicker
+    setFechaSeleccionada(format(inicioDate, "yyyy-MM-dd"));
+    setHoraInicio(format(inicioDate, "HH:mm"));
+    setHoraFin(format(finDate, "HH:mm"));
+
     setFormData({
       titulo: cita.titulo || "",
       descripcion: cita.descripcion || "",
-      fechaInicio: format(parseISO(cita.fechaInicio), "yyyy-MM-dd'T'HH:mm"),
-      fechaFin: format(parseISO(cita.fechaFin), "yyyy-MM-dd'T'HH:mm"),
+      fechaInicio: "",
+      fechaFin: "",
     });
     setError(null);
     openEditModal();
@@ -290,6 +337,9 @@ export default function Citas() {
       fechaInicio: "",
       fechaFin: "",
     });
+    setFechaSeleccionada("");
+    setHoraInicio("");
+    setHoraFin("");
     setSelectedCita(null);
     setError(null);
   };
@@ -386,8 +436,8 @@ export default function Citas() {
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
                 className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-dark-600 dark:bg-dark-700 dark:text-gray-300 dark:hover:border-dark-500"
               >
-                <option value={6}>6 por página</option>
-                <option value={12}>12 por página</option>
+                <option value={8}>8 por página</option>
+                <option value={16}>16 por página</option>
                 <option value={24}>24 por página</option>
               </select>
             </div>
@@ -396,8 +446,8 @@ export default function Citas() {
 
         {/* Cards Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(8)].map((_, i) => (
               <Card key={i} className="p-6">
                 <Skeleton className="mb-4 h-6 w-3/4 rounded" />
                 <Skeleton className="mb-2 h-4 w-full rounded" />
@@ -620,30 +670,105 @@ export default function Citas() {
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                   />
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Fecha y Hora de Inicio"
-                      type="datetime-local"
-                      value={formData.fechaInicio}
-                      onChange={(e) => {
-                        setFormData({ ...formData, fechaInicio: e.target.value });
-                        // Auto-calculate end time (30 min later) only when creating
-                        if (e.target.value && !selectedCita) {
-                          const inicio = new Date(e.target.value);
-                          const fin = addMinutes(inicio, 30);
-                          setFormData(prev => ({ ...prev, fechaFin: format(fin, "yyyy-MM-dd'T'HH:mm") }));
+                  {/* Fecha de la Cita */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Fecha de la Cita <span className="text-red-500">*</span>
+                    </label>
+                    <DatePicker
+                      value={fechaSeleccionada}
+                      onChange={(date) => {
+                        if (Array.isArray(date) && date.length > 0) {
+                          const selectedDate = new Date(date[0]);
+                          const formatted = selectedDate.toISOString().split('T')[0];
+                          setFechaSeleccionada(formatted);
+                        } else if (typeof date === 'string') {
+                          const selectedDate = new Date(date);
+                          const formatted = selectedDate.toISOString().split('T')[0];
+                          setFechaSeleccionada(formatted);
                         }
                       }}
-                      required
+                      options={{
+                        minDate: "today",
+                        dateFormat: "Y-m-d",
+                        locale: {
+                          firstDayOfWeek: 1,
+                        },
+                      }}
+                      placeholder="Seleccione la fecha de la cita..."
                     />
+                  </div>
 
-                    <Input
-                      label="Fecha y Hora de Fin"
-                      type="datetime-local"
-                      value={formData.fechaFin}
-                      onChange={(e) => setFormData({ ...formData, fechaFin: e.target.value })}
-                      required
-                    />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {/* Hora de Inicio */}
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Hora de Inicio <span className="text-red-500">*</span>
+                      </label>
+                      <DatePicker
+                        value={horaInicio}
+                        onChange={(time) => {
+                          if (Array.isArray(time) && time.length > 0) {
+                            const selectedTime = new Date(time[0]);
+                            const formatted = `${String(selectedTime.getHours()).padStart(2, '0')}:${String(selectedTime.getMinutes()).padStart(2, '0')}`;
+                            setHoraInicio(formatted);
+                          } else if (typeof time === 'string') {
+                            const selectedTime = new Date(time);
+                            const formatted = `${String(selectedTime.getHours()).padStart(2, '0')}:${String(selectedTime.getMinutes()).padStart(2, '0')}`;
+                            setHoraInicio(formatted);
+                          }
+                        }}
+                        options={{
+                          enableTime: true,
+                          noCalendar: true,
+                          dateFormat: "H:i",
+                          time_24hr: true,
+                        }}
+                        placeholder="Seleccione hora de inicio..."
+                      />
+                    </div>
+
+                    {/* Hora de Fin */}
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Hora de Fin <span className="text-red-500">*</span>
+                      </label>
+                      <DatePicker
+                        value={horaFin}
+                        onChange={(time) => {
+                          if (Array.isArray(time) && time.length > 0) {
+                            const selectedTime = new Date(time[0]);
+                            const formatted = `${String(selectedTime.getHours()).padStart(2, '0')}:${String(selectedTime.getMinutes()).padStart(2, '0')}`;
+                            setHoraFin(formatted);
+                          } else if (typeof time === 'string') {
+                            const selectedTime = new Date(time);
+                            const formatted = `${String(selectedTime.getHours()).padStart(2, '0')}:${String(selectedTime.getMinutes()).padStart(2, '0')}`;
+                            setHoraFin(formatted);
+                          }
+                        }}
+                        options={{
+                          enableTime: true,
+                          noCalendar: true,
+                          dateFormat: "H:i",
+                          time_24hr: true,
+                        }}
+                        placeholder="Seleccione hora de fin..."
+                      />
+                      {horaInicio && horaFin && (
+                        horaFin <= horaInicio ? (
+                          <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                            La hora de fin debe ser posterior a la hora de inicio
+                          </p>
+                        ) : (
+                          <div className="mt-1 flex items-center gap-2">
+                            <ClockIcon className="size-4 text-neutral-600 dark:text-neutral-400" />
+                            <span className="text-xs text-neutral-700 dark:text-neutral-300">
+                              Duración: {calculateDuration(formData.fechaInicio, formData.fechaFin)} minutos
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
 

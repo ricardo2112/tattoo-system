@@ -54,7 +54,7 @@ namespace Backend.Models
 
         [Column("estado")]
         [StringLength(20)]
-        public string Estado { get; set; } = "pendiente";
+        public string Estado { get; set; } = "Confirmada";
 
         // Relaciones
         public virtual ICollection<CitaTatuaje> CitaTatuajes { get; set; } = new List<CitaTatuaje>();
